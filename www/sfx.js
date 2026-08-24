@@ -118,10 +118,16 @@ const Sfx=(()=>{
     over(){ [330,262,196].forEach((f,i)=>setTimeout(()=>tone(f,0.28,"triangle",0.4),i*130)); },
     win(){ [392,523,659,784].forEach((f,i)=>setTimeout(()=>tone(f,0.22,"triangle",0.35),i*110)); },
     wave(){ tone(880,0.12,"sine",0.22,120); },
+    tick(){ tone(1150,0.035,"sine",0.05,-300); },
     near(k){
       const a=ctx(); if(!a||muted) return;
       tone(560+900*k,0.11,"sine",0.13+0.22*k,260);
       hat(a.currentTime,0.09+0.12*k,master);
+    },
+    corrupt(){
+      const a=ctx(); if(!a||muted) return;
+      tone(70,0.5,"sawtooth",0.22,25);
+      tone(210,0.35,"triangle",0.12,60);
     },
     music:{
       start(){
