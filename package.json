@@ -1,0 +1,29 @@
+{
+  "name": "arcade-point",
+  "version": "1.0.0",
+  "description": "POINT — jeu d'esquive mobile (iOS/Android/PWA). Un motif vivant dessiné par une formule mutable.",
+  "type": "commonjs",
+  "scripts": {
+    "icons": "node tools/gen-icons.js",
+    "assets": "npx @capacitor/assets generate --iconBackgroundColor '#050506' --splashBackgroundColor '#050506'",
+    "serve": "npx serve www",
+    "sync": "npm run assets && npx cap sync",
+    "add:ios": "npx cap add ios && npx cap sync ios",
+    "add:android": "npx cap add android && npx cap sync android",
+    "open:ios": "npx cap open ios",
+    "open:android": "npx cap open android",
+    "run:ios": "npx cap run ios",
+    "run:android": "npx cap run android"
+  },
+  "keywords": ["game", "pwa", "capacitor", "mobile"],
+  "license": "MIT",
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.0"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/ios": "^8.5.0"
+  }
+}

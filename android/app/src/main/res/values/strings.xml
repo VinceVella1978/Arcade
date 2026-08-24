@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">POINT</string>
+    <string name="title_activity_main">POINT</string>
+    <string name="package_name">com.vincentvella.point</string>
+    <string name="custom_url_scheme">com.vincentvella.point</string>
+</resources>
