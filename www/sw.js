@@ -1,13 +1,15 @@
 /* POINT — service worker
    Network-first pour HTML/JS/manifest : une seule rechargement suffit toujours
    à obtenir la version à jour. Cache = filet de sécurité hors-ligne. */
-const VER = "point-v5";
+const VER = "point-v8";
 const ASSETS = [
   "./",
   "./index.html",
   "./levels.js",
   "./sfx.js",
   "./manifest.webmanifest",
+  "./fonts/space-grotesk.woff2",
+  "./fonts/jetbrains-mono.woff2",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/maskable-512.png",
