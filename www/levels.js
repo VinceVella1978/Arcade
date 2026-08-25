@@ -131,6 +131,7 @@ for(let z=0;z<7;z++){
       speed: lerp(3.2,8.5,diff),
       density: Math.round(lerp(5200,8600,diff)),
       hotLayers: Math.round(lerp(3,12,diff)),
+      warnDur: +(lerp(1.65, 0.9, diff).toFixed(2)),
       tokensNeeded: n<3?2 : n<7?3 : 4,
       timeLimit: n===9 ? 45+Math.round(diff*30) : 0,
       mods:[],

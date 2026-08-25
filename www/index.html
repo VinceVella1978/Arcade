@@ -438,7 +438,7 @@ button.go.big{font-size:13px;min-height:60px;letter-spacing:.24em}
   <div class="help-grid">
     <div class="help-ico" style="color:var(--froid)">●</div>
     <div class="help-t"><b>Le motif se corrompt</b>
-      <span>Tout est blanc au départ, mais des couches <b style="color:var(--froid)">virent au bleu</b> au fil du niveau — et les bleues tuent. Frôler un bleu sans mourir = <b style="color:var(--chaud)">near-miss</b> : score bonus et combo qui monte (jusqu'à ×3). Le combo fond si vous jouez prudent, et saute si vous êtes touché.</span></div>
+      <span>Tout est blanc au départ. Avant de virer au bleu, une couche <b>clignote</b> — c'est votre fenêtre pour bouger. Une fois bleue, elle tue. Frôler un bleu sans mourir = <b style="color:var(--chaud)">near-miss</b> : score bonus et combo qui monte (jusqu'à ×3). Le combo fond si vous jouez prudent, et saute si vous êtes touché.</span></div>
   </div>
   <div class="help-grid">
     <div class="help-ico" style="color:var(--chaud)">▢</div>
@@ -654,23 +654,30 @@ function makeField(){
 /* gain d'échelle par famille : classic a une amplitude native ±136,
    les autres familles travaillent en disque unitaire → on les remonte */
 function famGain(){ return FAMILIES[L.fam].gain||1; }
-let corruptStack=[], corruptT=0;
-function corruptLayer(silent){
+let corruptStack=[], corruptT=0, warns=[];
+let warnMask=[], warnAge=[];
+function warnDur(){ return (L&&L.warnDur)||1.6; }
+function corruptLayer(quiet){
   const layers=P.layers||16;
-  if(corruptStack.length>=Math.min(L.hotLayers,layers-2)) return false;
-  const free=[]; for(let l=0;l<layers;l++) if(!hotMask[l]) free.push(l);
+  if(corruptStack.length+warns.length>=Math.min(L.hotLayers,layers-2)) return false;
+  const free=[]; for(let l=0;l<layers;l++) if(!hotMask[l]&&!warnMask[l]) free.push(l);
   if(!free.length) return false;
   const lay=free[Math.random()*free.length|0];
-  hotMask[lay]=true; corruptStack.push(lay);
+  warnMask[lay]=true; warnAge[lay]=0; warns.push({lay,age:0});
+  Sfx.warn();
+  if(!quiet && warns.length===1 && corruptStack.length===0) toast("le motif se corrompt");
   tokens.forEach(tk=>{ if(hotMask[tk.layer]) Object.assign(tk,newToken()); });
-  if(!silent){
-    Sfx.corrupt();
-    ringWave(fx,fy,A*.95,"200",.85);
-    if(corruptStack.length===1) toast("le motif se corrompt");
-  }
   return true;
 }
+function finalizeWarn(w){
+  warnMask[w.lay]=false; warnAge[w.lay]=0;
+  hotMask[w.lay]=true; corruptStack.push(w.lay);
+  Sfx.corrupt(); ringWave(fx,fy,A*.95,"200",.85);
+  tokens.forEach(tk=>{ if(hotMask[tk.layer]) Object.assign(tk,newToken()); });
+}
 function purifyLayer(){
+  const w=warns.pop();
+  if(w){ warnMask[w.lay]=false; warnAge[w.lay]=0; return true; }
   const lay=corruptStack.pop();
   if(lay==null) return false;
   hotMask[lay]=false;
@@ -717,7 +724,10 @@ function startLevel(n){
   slowmo=1; freezeT=0; hitstop=0; nearFlash=0; near={t:0,k:0};
   RISK.val=0; RISK.mul=1; RISK.timer=0;
   bestScore=SAVE.best(L.idx);
-  hotMask=Array(P.layers||16).fill(false); corruptStack=[]; corruptT=0;
+  hotMask=Array(P.layers||16).fill(false);
+  warnMask=Array(P.layers||16).fill(false);
+  warnAge=Array(P.layers||16).fill(0);
+  corruptStack=[]; warns=[]; corruptT=0;
   const firstDelay=Math.max(2, 5.5-L.diff*3.5);
   corruptT=firstDelay;
   tokens=[newToken(),newToken()];
@@ -826,6 +836,10 @@ function frame(now){
         if(corruptLayer()) corruptT=Math.max(2.2, 6.5-L.diff*4.2)*(0.8+Math.random()*0.5);
         else corruptT=999;
       }
+      for(let i=warns.length;i--;){
+        warns[i].age+=dt; warnAge[warns[i].lay]=warns[i].age;
+        if(warns[i].age>=warnDur()){ finalizeWarn(warns[i]); warns.splice(i,1); }
+      }
 
       /* musique pilotée par le danger réel */
       Sfx.music.setIntensity(Math.min(1,.3+L.diff*.45+RISK.val*.45));
@@ -917,7 +931,7 @@ function render(){
   const GAIN=FAMILIES[L.fam].gain||1;
   for(let i=n;i--;){
     const layer=i%layers;
-    if(!blinkOn&&((i*7)%layers)<3) continue;
+    if(!blinkOn&&!warnMask[layer]&&((i*7)%layers)<3) continue;
     const q=fieldFn(i,t);
     if(!q) continue;
     const [mx,my]=applyMods(q[0]*GAIN,q[1]*GAIN,i,t,{mods:L.mods});
@@ -925,13 +939,21 @@ function render(){
     if(!(X>-1e5&&X<1e5&&Y>-1e5&&Y<1e5)) continue;
 
     const hot=hotMask[layer];
+    const wrn=warnMask[layer];
     if(hot&&live){
       const dx=X-ship.x,dy=Y-ship.y;
       if(dx*dx+dy*dy<hitR2) hit=true;
       else if(RISK.val>0&&dx*dx+dy*dy<(21*rs)**2) nearPts.push([X,Y]);
     }
-    const sz=hot?szH:szA, al=hot?.72:.42;
-    const R=hot?95:255,G=hot?211:255;
+    let sz=szA, al=.42, R=255, G=255;
+    if(hot){ sz=szH; al=.72; R=95; G=211; }
+    else if(wrn){
+      const p=Math.min(1,warnAge[layer]/warnDur());
+      const freq=3+p*8;
+      const duty=.3+.5*p;
+      const on=((elapsed*freq)%1)<duty;
+      if(on){ sz=szH; al=.72; R=95; G=211; }
+    }
     const x0=(X|0)-(sz>>1),y0=(Y|0)-(sz>>1);
     for(let dy=0;dy<sz;dy++){
       const y=y0+dy;if(y<0||y>=H)continue;const base=y*W;
@@ -1198,7 +1220,7 @@ function openPatch(){
       m.f(P);patchCount++;
       let purif=false;
       if(!m.calme){score+=600;if(corruptLayer(true))toast("le motif s'envenime");}
-      else if(corruptStack.length>0){
+      else if(corruptStack.length+warns.length>0){
         purifyLayer();purif=true;
         burst(fx,fy,40,300*rs,200,.9);ringWave(fx,fy,A*.9,"200",.8);
       }

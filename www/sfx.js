@@ -129,6 +129,11 @@ const Sfx=(()=>{
       tone(70,0.5,"sawtooth",0.22,25);
       tone(210,0.35,"triangle",0.12,60);
     },
+    warn(){
+      const a=ctx(); if(!a||muted) return;
+      tone(880,0.08,"sine",0.10,-180);
+      setTimeout(()=>{ if(!muted) tone(720,0.07,"sine",0.08,-140); },110);
+    },
     music:{
       start(){
         const a=ctx(); if(!a||muted) return;
