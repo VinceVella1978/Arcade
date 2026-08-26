@@ -647,7 +647,7 @@ const nearPts=[];
 
 /* base formule par famille */
 function makeParams(fam){
-  return {amp:9,fa:5,fb:1,fc:3,fd:2,scale:1999,swirl:16,ring:99,harm:4,spin:48,breath:3,layers:16,spread:13};
+  return {amp:9,fa:7,fb:1,fc:3,fd:2,scale:1999,swirl:16,ring:99,harm:7,spin:48,breath:3,layers:16,spread:13};
 }
 function makeField(){
   return FAMILIES[L.fam].make(P);
@@ -1147,7 +1147,7 @@ function render(){
 /* fond animé derrière les menus */
 function drawIdle(){
   const cx=fx,cy=fy,n=COARSE?1400:2400;
-  const pp={amp:9,fa:5,fb:1,fc:3,fd:2,scale:1999,swirl:16,ring:99,harm:4,spin:48,breath:3,layers:16,spread:13};
+  const pp={amp:9,fa:7,fb:1,fc:3,fd:2,scale:1999,swirl:16,ring:99,harm:7,spin:48,breath:3,layers:16,spread:13};
   const fn=FAMILIES.classic.make(pp);
   const sz=Math.max(1,Math.round(rs));
   for(let i=n;i--;){

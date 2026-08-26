@@ -1,7 +1,7 @@
 /* POINT — service worker
    Network-first pour HTML/JS/manifest : une seule rechargement suffit toujours
    à obtenir la version à jour. Cache = filet de sécurité hors-ligne. */
-const VER = "point-v23";
+const VER = "point-v25";
 const ASSETS = [
   "./",
   "./index.html",

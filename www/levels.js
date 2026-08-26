@@ -31,8 +31,29 @@ function wrapShape(shape){
     };
   };
 }
+function fieldHorned(P){
+  return (i,t)=>{
+    const m=(i%P.layers)*P.spread;
+    const k=P.amp*Math.cos(i*P.fa)*Math.sin(i*P.fb);
+    const e=Math.cos(i*P.fc)*Math.cos(i*P.fd)*P.amp;
+    const g=Math.hypot(k,e);
+    const d=g*g*g/P.scale+1.5-Math.pow(Math.sin(t/2+m),3)/P.breath;
+    if(d<=0) return null;
+    const c=d/P.swirl-t/P.spin+m;
+    const p=Math.pow(d,Math.sin(d*d-t+m));
+    const ox=P.ring*Math.sin(c)+k*p;
+    const oy=P.ring*Math.sin(c*P.harm)+e*p;
+    const face=Math.atan2(P.harm*Math.cos(c*P.harm), Math.cos(c));
+    const slot=i%8;
+    if(slot===0||slot===1){
+      const ha=face+(slot?1:-1)*0.50;
+      return [ox+22*Math.cos(ha), oy+22*Math.sin(ha)];
+    }
+    return [ox,oy];
+  };
+}
 const FAMILIES={
-  classic:{label:"CLASSIQUE", make:fieldClassic},
+  classic:{label:"CLASSIQUE", make:fieldHorned},
   rose:   {label:"ROSACE",    make:wrapShape((x,y)=>{
     const r=Math.hypot(x,y), a=Math.atan2(y,x);
     const r2=r*(0.92+0.08*Math.cos(5*a));
@@ -51,7 +72,7 @@ const FAMILIES={
     const r2=r*(0.88+0.12*Math.cos(6*a));
     return [r2*Math.cos(a), r2*Math.sin(a)];
   })},
-  swarm:  {label:"NUÉE", make:fieldClassic},
+  swarm:  {label:"NUÉE", make:fieldHorned},
 };
 
 const MOTIONS={
