@@ -453,7 +453,7 @@ button.go.big{font-size:13px;min-height:60px;letter-spacing:.24em}
     <button id="btn-profile"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l7.8 9-7.8 9-7.8-9L12 3z"/></svg><span>pilote</span></button>
     <button id="btn-help"><svg class="ico" viewBox="0 0 24 24"><path d="M9.2 9a3 3 0 115.1 2.1c-.9.9-2.3 1.4-2.3 3v.5"/><circle cx="12" cy="18.6" r=".5"/><circle cx="12" cy="12" r="10" opacity=".35"/></svg><span>aide</span></button>
   </nav>
-  <p class="home-foot">7 mythes · 70 figures · <span id="foot-ver">v14</span></p>
+  <p class="home-foot">7 mythes · 70 figures · <span id="foot-ver">v15</span></p>
 </div></div>
 
 <div class="scr" id="s-profile"><div class="card">
@@ -611,7 +611,7 @@ button.go.big{font-size:13px;min-height:60px;letter-spacing:.24em}
 
 <div class="toast" id="toast"></div>
 <div id="ver" style="position:fixed;right:calc(6px + var(--safe-r));bottom:calc(4px + var(--safe-b));
-  font-size:8px;letter-spacing:.2em;color:#3c3a48;pointer-events:none;z-index:50">v14</div>
+  font-size:8px;letter-spacing:.2em;color:#3c3a48;pointer-events:none;z-index:50">v15</div>
 <pre id="errbox" style="display:none;position:fixed;left:8px;top:calc(8px + var(--safe-t));z-index:9999;
   background:#2a0a0a;color:#ff9a9a;font:10px/1.4 var(--mono);padding:10px;max-width:90vw;
   white-space:pre-wrap;border:1px solid #ff5a5a"></pre>
@@ -1959,7 +1959,7 @@ $("btn-unlock").onclick=()=>{
 
 /* init */
 resize();goHome();requestAnimationFrame(frame);
-$("ver").textContent="v14 · "+(COARSE?"tactile":"souris");
+$("ver").textContent="v15 · "+(COARSE?"tactile":"souris");
 setTimeout(()=>{ $("splash").classList.add("off"); },1400);
 /* premier lancement → aide auto */
 try{

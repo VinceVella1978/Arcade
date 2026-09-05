@@ -23,58 +23,33 @@ function fieldClassic(P){
     return [P.ring*Math.sin(c)+k*p, P.ring*Math.sin(c*P.harm)+e*p];
   };
 }
-function wrapShape(shape){
+/* toutes les bêtes sont des variantes du pulsar (figure 50) :
+   la nappe, pliée en lobes. n = pétales, depth = creux entre les lobes,
+   twist / spiral / harm / gamma = l'accent du mythe. pulse = la référence. */
+function wrapLobe({n=6, depth=0.12, twist=0, spiral=0, harm=0, gamma=1}){
   return P=>{
     const fn=fieldClassic(P);
     return (i,t)=>{
       const q=fn(i,t); if(!q) return null;
-      return shape(q[0], q[1]);
+      const petals=P.petals||n;
+      const r=Math.hypot(q[0],q[1]), a0=Math.atan2(q[1],q[0]);
+      const a=a0+spiral*r;
+      let w=Math.cos(petals*a);
+      if(gamma!==1){ const s=w<0?-1:1; w=s*Math.pow(Math.abs(w),gamma); }
+      if(harm) w=0.72*w+0.28*Math.cos(harm*a);
+      const r2=r*(1-depth+depth*w);
+      const a2=a+twist*Math.sin(petals*a0);
+      return [r2*Math.cos(a2), r2*Math.sin(a2)];
     };
   };
 }
-/* les créatures cornues de l'Éveil : la tête porte deux petites cornes en V */
-function fieldHorned(P){
-  return (i,t)=>{
-    const m=(i%P.layers)*P.spread;
-    const k=P.amp*Math.cos(i*P.fa)*Math.sin(i*P.fb);
-    const e=Math.cos(i*P.fc)*Math.cos(i*P.fd)*P.amp;
-    const g=Math.hypot(k,e);
-    const d=g*g*g/P.scale+1.5-Math.pow(Math.sin(t/2+m),3)/P.breath;
-    if(d<=0) return null;
-    const c=d/P.swirl-t/P.spin+m;
-    const p=Math.pow(d,Math.sin(d*d-t+m));
-    const ox=P.ring*Math.sin(c)+k*p;
-    const oy=P.ring*Math.sin(c*P.harm)+e*p;
-    const face=Math.atan2(P.harm*Math.cos(c*P.harm), Math.cos(c));
-    const slot=i%8;
-    if(slot===0||slot===1){
-      const ha=face+(slot?1:-1)*0.50;
-      return [ox+22*Math.cos(ha), oy+22*Math.sin(ha)];
-    }
-    return [ox,oy];
-  };
-}
 const FAMILIES={
-  classic:{label:"CLASSIQUE", make:fieldHorned},
-  rose:   {label:"ROSACE",    make:wrapShape((x,y)=>{
-    const r=Math.hypot(x,y), a=Math.atan2(y,x);
-    const r2=r*(0.92+0.08*Math.cos(5*a));
-    const a2=a+0.16*Math.sin(5*a);
-    return [r2*Math.cos(a2), r2*Math.sin(a2)];
-  })},
-  vortex: {label:"VORTEX",    make:wrapShape((x,y)=>{
-    const r=Math.hypot(x,y), a=Math.atan2(y,x);
-    return [r*Math.cos(a+0.011*r), r*Math.sin(a+0.011*r)];
-  })},
-  weave:  {label:"TRESSE",    make:wrapShape((x,y)=>[
-    x+12*Math.sin(y*0.036), y+8*Math.sin(x*0.032)
-  ])},
-  pulse:  {label:"PULSAR",    make:wrapShape((x,y)=>{
-    const r=Math.hypot(x,y), a=Math.atan2(y,x);
-    const r2=r*(0.88+0.12*Math.cos(6*a));
-    return [r2*Math.cos(a), r2*Math.sin(a)];
-  })},
-  swarm:  {label:"NUÉE", make:fieldHorned},
+  classic:{label:"CLASSIQUE", make:wrapLobe({n:4, depth:0.13, gamma:1.28})},          // I  labyrinthe : quatre angles
+  rose:   {label:"ROSACE",    make:wrapLobe({n:5, depth:0.13, twist:0.08})},          // II méduse : cinq pétales
+  vortex: {label:"VORTEX",    make:wrapLobe({n:6, depth:0.12, spiral:0.0048})},       // III charybde : six lobes enroulés
+  weave:  {label:"TRESSE",    make:wrapLobe({n:3, depth:0.12, harm:6})},               // IV moires : trois + l'octave
+  pulse:  {label:"PULSAR",    make:wrapLobe({n:6, depth:0.12})},                       // V  argos : la référence
+  swarm:  {label:"NUÉE",      make:wrapLobe({n:4, depth:0.13, gamma:1.28})},
 };
 
 const MOTIONS={
