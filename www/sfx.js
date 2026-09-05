@@ -134,6 +134,19 @@ const Sfx=(()=>{
       tone(880,0.08,"sine",0.10,-180);
       setTimeout(()=>{ if(!muted) tone(720,0.07,"sine",0.08,-140); },110);
     },
+    /* la Porte s'ouvre : quinte ascendante puis nappe brève */
+    door(){
+      const a=ctx(); if(!a||muted) return;
+      tone(392,0.5,"triangle",0.22);
+      setTimeout(()=>{ if(!muted) tone(587,0.55,"triangle",0.22); },120);
+      setTimeout(()=>{ if(!muted){ tone(784,0.7,"sine",0.18); tone(1568,0.6,"sine",0.06); } },260);
+    },
+    /* pétrification : grain minéral + grave sourd */
+    stone(){
+      const a=ctx(); if(!a||muted) return;
+      tone(110,0.35,"sawtooth",0.12,-40);
+      hat(a.currentTime,0.16,master); hat(a.currentTime+.06,0.10,master);
+    },
     music:{
       start(){
         const a=ctx(); if(!a||muted) return;

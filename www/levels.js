@@ -1,7 +1,8 @@
 /* ══════════════════════════════════════════════════════════════
-   POINT — campagne 70 niveaux
-   Chaque niveau = (formule de base, modificateurs, objectifs).
-   La formule dweet est le "génome" ; les mods la déforment.
+   POINT — campagne 70 figures, 7 mythes
+   Une seule nappe (la formule dweet) ; chaque zone la plie autrement,
+   la fait bouger autrement, et lui prête un monstre.
+   Géométrie = règles. Mythologie = noms, versets, épreuves.
    ══════════════════════════════════════════════════════════════ */
 "use strict";
 
@@ -31,6 +32,7 @@ function wrapShape(shape){
     };
   };
 }
+/* les créatures cornues de l'Éveil : la tête porte deux petites cornes en V */
 function fieldHorned(P){
   return (i,t)=>{
     const m=(i%P.layers)*P.spread;
@@ -77,11 +79,11 @@ const FAMILIES={
 
 const MOTIONS={
   spin:    {label:"ROTATION",     desc:"le motif tourne sur lui-même — le mouvement de base"},
-  precess: {label:"PRÉCESSION",   desc:"tout le motif bascule autour du centre"},
-  breathe: {label:"RESPIRATION",  desc:"les brins s'écartent puis se resserrent"},
-  shear:   {label:"CISSAILLEMENT",desc:"les couches glissent en sens inverse"},
-  orbit:   {label:"ORBITES",      desc:"chaque point gravite autour de sa place"},
-  tumble:  {label:"TOURBILLON",   desc:"chaque couche tourne à sa propre vitesse"},
+  precess: {label:"PRÉCESSION",   desc:"tout le motif bascule autour du centre, comme une tête qui se tourne"},
+  breathe: {label:"RESPIRATION",  desc:"les brins s'écartent puis se resserrent — le gouffre inspire"},
+  shear:   {label:"CISAILLEMENT", desc:"les couches glissent en sens inverse, fil contre fil"},
+  orbit:   {label:"ORBITES",      desc:"chaque point gravite autour de sa place — cent yeux qui roulent"},
+  tumble:  {label:"TOURBILLON",   desc:"chaque couche tourne à sa propre vitesse — la boucle se mord"},
 };
 function applyMotion(x,y,i,t,kind){
   if(!kind || kind==="spin") return [x,y];
@@ -111,42 +113,73 @@ function applyMotion(x,y,i,t,kind){
   return [x,y];
 }
 
-/* ── modificateurs par niveau ── */
+/* ── modificateurs par niveau ──
+   Les deux nouveaux (regard, pénombre) sont gérés dans le moteur :
+   ils n'altèrent pas la formule mais le vaisseau et la lumière. ── */
 const MODS={
-  none:   {label:"", desc:""},
-  drift:  {label:"DÉRIVE", desc:"le motif glisse latéralement"},
-  mirror: {label:"MIROIR", desc:"une moitié du motif bascule en douceur"},
-  storm:  {label:"ORAGE", desc:"secousses aléatoires du motif"},
-  gravity:{label:"MARÉE", desc:"le vaisseau est tiré vers le centre"},
-  shrink: {label:"ÉTRANGLEMENT", desc:"la zone sûre rétrécit puis reprend"},
+  none:   {label:"", desc:"", ico:""},
+  drift:  {label:"DÉRIVE",   ico:"⇢", desc:"le motif glisse lentement de côté"},
+  mirror: {label:"MIROIR",   ico:"⧉", desc:"une moitié du motif bascule en douceur"},
+  storm:  {label:"ORAGE",    ico:"⚡", desc:"secousses aléatoires du motif"},
+  gravity:{label:"GOUFFRE",  ico:"◎", desc:"le vaisseau est tiré vers le centre"},
+  shrink: {label:"ÉTAU",     ico:"▣", desc:"la zone sûre se resserre puis relâche"},
+  gaze:   {label:"REGARD",   ico:"◉", desc:"un regard balaie l'arène — y rester vous pétrifie et ralentit vos gestes"},
+  eclipse:{label:"PÉNOMBRE", ico:"◐", desc:"la nuit se referme autour de vous ; seule votre lumière révèle le motif"},
 };
-function applyMods(x,y,i,t,st){
-  if(st.mods.includes("drift")){
-    x+=Math.sin(t*0.4+i*0.01)*0.06; y+=Math.cos(t*0.31)*0.05;
+function applyMods(x,y,i,t,mods){
+  if(!mods.length) return [x,y];
+  if(mods.includes("drift")){
+    x+=Math.sin(t*0.4)*5.5; y+=Math.cos(t*0.31)*4;
   }
-  if(st.mods.includes("mirror")){
+  if(mods.includes("mirror")){
     const w=0.5+0.5*Math.sin(t*0.35);
     if(((i*2654435761)>>>28)%2) x=x*(1-2*w);
   }
   return [x,y];
 }
 
-/* ── génération des 70 niveaux ──
-   Zone 1 (Éveil) : inchangée — tutoriel lisible.
-   Zones 2–7 : une idée nouvelle par zone, max 2 mods, les chiffres
-   plafonnent (vitesse, couches bleues) pour rester jouable. */
+/* ── les sept mythes ──
+   name = nom géométrique (la règle), myth = nom mythologique (le monstre),
+   epigraph = verset d'entrée, boss = nom de l'épreuve (figure 10). */
 const ZONES=[
-  {name:"ÉVEIL",       fam:"classic", motion:"spin",    hue:200},
-  {name:"ROSACE",      fam:"rose",    motion:"precess", hue:280},
-  {name:"VORTEX",      fam:"vortex",  motion:"breathe", hue:180},
-  {name:"TRESSE",      fam:"weave",   motion:"shear",   hue:330},
-  {name:"PULSAR",      fam:"pulse",   motion:"orbit",   hue:150},
-  {name:"CHAOS",       fam:"mixed",   motion:"mixed",   hue:20},
-  {name:"SINGULARITÉ", fam:"mixed",   motion:"tumble",  hue:0},
+  {num:"I",   myth:"LABYRINTHE", name:"ÉVEIL",       fam:"classic", motion:"spin",    hue:200, sigil:"maze",
+   epigraph:"Le Minotaure n'a jamais eu de corps. Il n'a que des angles, et il tourne.",
+   boss:"Le Minotaure", bossLine:"Tenez le centre du dédale jusqu'à ce qu'il se lasse."},
+  {num:"II",  myth:"MÉDUSE",     name:"ROSACE",      fam:"rose",    motion:"precess", hue:280, sigil:"gaze",
+   epigraph:"Chaque pétale est un regard. Ne restez jamais dans l'axe.",
+   boss:"Le Regard", bossLine:"Elle ne cligne pas. Vous, si — bougez."},
+  {num:"III", myth:"CHARYBDE",   name:"VORTEX",      fam:"vortex",  motion:"breathe", hue:180, sigil:"spiral",
+   epigraph:"Le gouffre respire. Ce qui entre au centre y reste.",
+   boss:"La Gorge", bossLine:"Trois fois par jour elle avale la mer. Ce soir, c'est vous."},
+  {num:"IV",  myth:"LES MOIRES", name:"TRESSE",      fam:"weave",   motion:"shear",   hue:330, sigil:"web",
+   epigraph:"Trois sœurs tissent la même ligne. La troisième porte des ciseaux.",
+   boss:"Le Fil coupé", bossLine:"Le métier se resserre. Restez dans la maille."},
+  {num:"V",   myth:"ARGOS",      name:"PULSAR",      fam:"pulse",   motion:"orbit",   hue:150, sigil:"eyes",
+   epigraph:"Cent yeux, tous en orbite. Quand ils se ferment, la nuit tombe autour de vous.",
+   boss:"La Veille", bossLine:"Argos ne dort jamais tout entier. Vous non plus."},
+  {num:"VI",  myth:"CHAOS",      name:"MÉLANGE",     fam:"mixed",   motion:"mixed",   hue:20,  sigil:"shards",
+   epigraph:"Avant les formes, il n'y avait que la formule. Le Chaos s'en souvient.",
+   boss:"L'Informe", bossLine:"Toutes les figures à la fois. Aucune règle ne tient longtemps."},
+  {num:"VII", myth:"OUROBOROS",  name:"SINGULARITÉ", fam:"mixed",   motion:"tumble",  hue:0,   sigil:"ring",
+   epigraph:"La boucle se mord la queue. La formule se réécrit elle-même.",
+   boss:"La Boucle", bossLine:"Il n'y a pas de Porte ici. Seulement la fin du tour."},
 ];
 const FAM_MOTION={classic:"spin",rose:"precess",vortex:"breathe",weave:"shear",pulse:"orbit"};
-const ZONE_SIGN=[null,"drift","mirror",null,"storm","gravity","shrink"];
+
+/* signature de chaque zone : mod principal (dès la 4e figure), mod secondaire (dès la 8e).
+   Un tableau = rotation d'un niveau à l'autre. */
+const ZONE_MODS=[
+  null,
+  {main:"gaze",    second:"drift",   mainAt:3, secondAt:7},
+  {main:"gravity", second:"gaze",    mainAt:3, secondAt:7},
+  {main:"shrink",  second:"mirror",  mainAt:3, secondAt:7},
+  {main:"eclipse", second:"gravity", mainAt:3, secondAt:7},
+  {main:"storm",   second:["gaze","shrink","eclipse"], mainAt:2, secondAt:5},
+  {main:["gravity","shrink","gaze","eclipse"], second:"storm", mainAt:0, secondAt:4},
+];
+const pickMod=(m,n)=>Array.isArray(m)?m[n%m.length]:m;
 function easeOut(t){ return 1-Math.pow(1-t,1.55); }
+const round50=v=>Math.round(v/50)*50;
 
 const LEVELS=[];
 for(let z=0;z<7;z++){
@@ -154,11 +187,13 @@ for(let z=0;z<7;z++){
     const idx=z*10+n;
     const zone=ZONES[z];
     const fam=zone.fam==="mixed" ? ["classic","rose","vortex","weave","pulse"][idx%5] : zone.fam;
+    const boss=n===9;
 
     if(z===0){
+      /* Zone I : le tutoriel, inchangé dans ses chiffres */
       const diff=idx/69;
       const lvl={
-        idx, zone:z, num:idx+1, name:zone.name, diff, fam,
+        idx, zone:z, num:idx+1, name:zone.name, diff, fam, boss,
         speed: lerp(3.2,8.5,diff),
         density: Math.round(lerp(5200,8600,diff)),
         hotLayers: Math.round(lerp(3,12,diff)),
@@ -167,20 +202,24 @@ for(let z=0;z<7;z++){
         firstDelay: +(Math.max(2, 5.5-diff*3.5).toFixed(2)),
         corruptGap: +(Math.max(2.2, 6.5-diff*4.2).toFixed(2)),
         tokensNeeded: n<3?2 : n<7?3 : 4,
-        timeLimit: n===9 ? 45+Math.round(diff*30) : 0,
+        oracles: 1,
+        doorSpeed: 0.10,
+        timeLimit: boss ? 45 : 0,
         mods:[],
         motion:"spin",
       };
       if(n>=2 && (idx%3===0)) lvl.mods.push("drift");
       if(n>=4 && (idx%4===1)) lvl.mods.push("mirror");
+      lvl.scoreGoal=round50(lvl.tokensNeeded*150*1.5 + idx*60 + (boss?600:0));
       LEVELS.push(lvl);
       continue;
     }
 
     const u=easeOut((idx-10)/59);
     const diff=0.14+u*0.62;
+    const zm=ZONE_MODS[z];
     const lvl={
-      idx, zone:z, num:idx+1, name:zone.name, diff, fam,
+      idx, zone:z, num:idx+1, name:zone.name, diff, fam, boss,
       hotLayers: Math.round(lerp(4, 7, u)),
       density: Math.round(lerp(5600, 6800, u)),
       speed: +(lerp(3.85, 5.4, u).toFixed(2)),
@@ -189,15 +228,26 @@ for(let z=0;z<7;z++){
       firstDelay: +(lerp(4.6, 3.2, u).toFixed(2)),
       corruptGap: +(lerp(5.4, 3.8, u).toFixed(2)),
       tokensNeeded: n<4?2 : 3,
+      oracles: z<=2 ? 1 : z<=4 ? (n<5?1:2) : 2,
+      doorSpeed: +(lerp(0.12, 0.22, u).toFixed(2)),
       tokenDelay: +(lerp(3.2, 5.8, u).toFixed(2)),
       tokenGap: +(lerp(3.6, 6.2, u).toFixed(2)),
       tokenLife: z>=5 ? +(lerp(10.5, 5.4, Math.max(0,(idx-50)/19)).toFixed(2)) : 0,
-      timeLimit: n===9 ? Math.round(lerp(42, 52, u)) : 0,
+      /* regard : largeur du cône et vitesse de balayage montent avec u */
+      gazeWidth: +(lerp(0.30, 0.44, u).toFixed(2)),
+      gazeSpeed: +(lerp(0.36, 0.55, u).toFixed(2)),
+      /* pénombre : rayon minimal de lumière (fraction de l'arène) */
+      eclipseMin: +(lerp(0.34, 0.24, u).toFixed(2)),
+      timeLimit: boss ? Math.round(lerp(45, 63, z/6)) : 0,
       mods:[],
       motion: zone.motion==="mixed" ? (FAM_MOTION[fam]||"spin") : zone.motion,
     };
-    if(n>=4 && ZONE_SIGN[z]) lvl.mods.push(ZONE_SIGN[z]);
-    if(n>=8 && ZONE_SIGN[z-1]) lvl.mods.push(ZONE_SIGN[z-1]);
+    if(n>=zm.mainAt) lvl.mods.push(pickMod(zm.main,n));
+    if(n>=zm.secondAt){
+      const s=pickMod(zm.second,n);
+      if(!lvl.mods.includes(s)) lvl.mods.push(s);
+    }
+    lvl.scoreGoal=round50(lvl.tokensNeeded*lvl.oracles*150*1.5 + idx*60 + (boss?lvl.timeLimit*14:0));
     LEVELS.push(lvl);
   }
 }

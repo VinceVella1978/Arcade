@@ -13,7 +13,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<title>POINT — 70 niveaux</title>
+<title>POINT — sept mythes, soixante-dix figures</title>
 <style>
 @font-face{
   font-family:"Space Grotesk";font-style:normal;font-weight:300 700;font-display:swap;
@@ -90,9 +90,29 @@ button.go{border-color:transparent;color:#141005;font-weight:700;width:100%;
 .bottom{position:absolute;left:calc(12px + var(--safe-l));right:calc(12px + var(--safe-r));
         bottom:calc(12px + var(--safe-b));display:flex;align-items:flex-end;justify-content:space-between}
 #obj{border:1px solid var(--line);background:var(--glass);color:#918da6;
-     font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:11px 14px;line-height:1.5}
-#obj b{display:block;color:var(--chaud);text-transform:none;letter-spacing:.02em;
-       font-size:12px;font-weight:600;margin-top:3px}
+     font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:11px 14px;line-height:1.5;
+     transition:border-color .3s}
+#obj>b{display:block;color:#c9c5da;text-transform:none;letter-spacing:.02em;
+       font-size:12px;font-weight:500;margin-top:3px}
+#obj>b b{color:var(--chaud);font-weight:700;font-family:var(--disp);font-variant-numeric:tabular-nums}
+#obj.boss{border-color:rgba(255,180,84,.35)}
+#obj.boss>b b{font-size:14px}
+
+/* ══ carton d'entrée ══ */
+#intro{position:fixed;left:0;right:0;top:calc(22% + var(--safe-t));text-align:center;pointer-events:none;
+  z-index:4;opacity:0;padding:0 28px;--zh:200}
+#intro.on{animation:introIn 3.4s cubic-bezier(.2,.8,.2,1) both}
+@keyframes introIn{0%{opacity:0;transform:translateY(10px)}12%{opacity:1;transform:none}
+  72%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
+.in-z{display:flex;align-items:baseline;justify-content:center;gap:12px}
+.in-z span{font-family:var(--mono);font-size:12px;letter-spacing:.3em;color:hsl(var(--zh) 85% 72%);
+  border:1px solid hsl(var(--zh) 85% 72% / .5);padding:3px 7px}
+.in-z b{font-family:var(--disp);font-weight:700;font-size:clamp(28px,9vw,44px);letter-spacing:.06em;
+  color:var(--ink);text-shadow:0 2px 24px rgba(0,0,0,.9)}
+#in-lvl{margin-top:8px;font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+#in-epi{margin:14px auto 0;max-width:340px;font-family:var(--disp);font-weight:400;font-style:italic;
+  font-size:14px;line-height:1.55;color:#d8d5e6;text-shadow:0 1px 10px rgba(0,0,0,.95)}
+@media (orientation:landscape) and (max-height:500px){#intro{top:calc(10% + var(--safe-t))}}
 
 /* ══ écrans ══ */
 .scr{position:fixed;inset:0;display:none;place-items:center;pointer-events:auto;
@@ -131,10 +151,16 @@ h1 small{display:block;font-family:var(--mono);font-size:10.5px;font-weight:500;
 .zones{display:grid;gap:14px}
 .zone h2{font-family:var(--disp);font-weight:600;font-size:12.5px;letter-spacing:.18em;color:var(--ink);
          text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
-.zone h2::before{content:"0" attr(data-z);font-family:var(--mono);font-size:9.5px;
+.zone h2::before{content:attr(data-z);font-family:var(--mono);font-size:9.5px;min-width:26px;text-align:center;
   color:hsl(var(--zh,38) 90% 66%);border:1px solid hsl(var(--zh,38) 90% 66% / .4);padding:3px 6px}
+.zone h2 em{font-style:normal;font-family:var(--mono);font-weight:400;font-size:10px;letter-spacing:.14em;
+  color:var(--dim);text-transform:lowercase}
 .zone h2 small{margin-left:auto;font-family:var(--mono);font-size:11px;font-weight:400}
 .zone h2::after{content:"";flex:0;height:0}
+.lvltile.boss{border-style:double;border-width:3px;border-color:hsl(var(--zh,38) 80% 60% / .5)}
+.lvltile.boss::before{content:"";position:absolute;top:4px;right:4px;width:5px;height:5px;
+  background:hsl(var(--zh,38) 80% 62%);transform:rotate(45deg);opacity:.6}
+.lvltile.boss.locked{border-style:dashed;border-width:1px}
 .lvlrow{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
 .lvltile{position:relative;aspect-ratio:1;border:1px solid var(--line);display:grid;place-items:center;
   font-family:var(--disp);font-weight:600;font-size:15px;color:var(--ink);
@@ -160,11 +186,23 @@ h1 small{display:block;font-family:var(--mono);font-size:10.5px;font-weight:500;
   transition:background .25s,box-shadow .25s}
 .stars i.on{background:var(--chaud);box-shadow:0 0 14px rgba(255,180,84,.6)}
 .stars i.on::after{content:"";position:absolute;inset:3.8px;background:rgba(255,255,255,.4)}
+.stars.sm{margin:0 0 14px;gap:8px}
+.stars.sm i{width:9px;height:9px}
+.stars.sm i.on::after{inset:2.6px}
+.crit{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:-6px 0 10px;
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dimmer)}
+.crit .ok{color:var(--chaud)}
+.epi{font-family:var(--disp);font-style:italic;font-size:13.5px !important;line-height:1.6 !important;
+  color:#d8d5e6 !important;border-left:2px solid hsl(var(--zh,38) 80% 62% / .7);padding-left:12px;margin:2px 0 14px !important}
+.pick{border-left:3px solid transparent}
+.pick.calm{border-left-color:rgba(95,211,255,.55)}
+.pick.bold{border-left-color:rgba(255,180,84,.6)}
+.pick .badge{font-size:10px;letter-spacing:.1em;border:1px solid currentColor;padding:4px 6px;white-space:nowrap;flex:none}
 
-.stats{display:flex;gap:22px;margin:2px 0 16px;font-size:11px;letter-spacing:.12em;
+.stats{display:flex;gap:18px;flex-wrap:wrap;margin:2px 0 16px;font-size:11px;letter-spacing:.12em;
        text-transform:uppercase;color:var(--dim)}
-.stats b{display:block;font-family:var(--disp);font-weight:600;font-size:21px;letter-spacing:.01em;
-         color:var(--ink);margin-top:5px;font-variant-numeric:tabular-nums}
+.stats b{display:block;font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:.01em;
+         color:var(--ink);margin-top:5px;font-variant-numeric:tabular-nums;text-transform:none;white-space:nowrap}
 
 .toast{position:fixed;left:50%;top:20%;transform:translateX(-50%) translateY(6px);font-size:11.5px;
   font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--ink);opacity:0;
@@ -189,7 +227,7 @@ h1 small{display:block;font-family:var(--mono);font-size:10.5px;font-weight:500;
   letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
 .pf-z b{color:var(--ink);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pf-bar{height:4px;background:#26242f;position:relative;overflow:hidden}
-.pf-bar i{position:absolute;inset:0;background:var(--chaud);transform-origin:left;transition:transform .5s ease}
+.pf-bar i{position:absolute;inset:0;background:hsl(var(--zh,38) 80% 62%);transform-origin:left;transition:transform .5s ease}
 .pf-z span{text-align:right;color:#9b97ae;font-variant-numeric:tabular-nums}
 
 /* ══ aide ══ */
@@ -198,8 +236,9 @@ h1 small{display:block;font-family:var(--mono);font-size:10.5px;font-weight:500;
 .help-grid:last-of-type{border-bottom:0}
 .help-ico{width:52px;height:52px;border:1px solid var(--line);display:grid;place-items:center;
   font-size:19px;background:rgba(255,255,255,.02)}
-.help-t b{display:block;font-size:13px;color:var(--ink);margin-bottom:3px}
+.help-t>b{display:block;font-size:13px;color:var(--ink);margin-bottom:3px;font-family:var(--disp);font-weight:600}
 .help-t span{font-size:12px;line-height:1.6;color:#a9a5bc}
+.help-t span b{color:var(--ink);font-weight:500}
 
 /* ══ combo de risque ══ */
 #combo{position:fixed;left:calc(12px + var(--safe-l));top:calc(64px + var(--safe-t));
@@ -351,9 +390,9 @@ button.go.big{font-size:13px;min-height:60px;letter-spacing:.24em}
     <div><b class="score" id="score" role="status" aria-live="off">0</b>score · <span class="mult" id="mult">×1.0</span></div>
     <div class="right">
       <div class="meta">
-        <div class="meta-row"><span class="meta-lbl">niveau</span><b id="lvlname">1</b></div>
+        <div class="meta-row"><span class="meta-lbl">figure</span><b id="lvlname">1</b></div>
         <div class="meta-row"><span class="meta-lbl">vies</span><span class="pips" id="lives"></span></div>
-        <div class="meta-row"><span class="meta-lbl" id="chargelbl">bonus</span><span class="pips" id="charge"></span></div>
+        <div class="meta-row"><span class="meta-lbl" id="chargelbl">tessères</span><span class="pips" id="charge"></span></div>
       </div>
       <div class="hud-btns">
         <button id="btn-snd" class="hit iconbtn" aria-label="son">
@@ -370,10 +409,17 @@ button.go.big{font-size:13px;min-height:60px;letter-spacing:.24em}
 
 <div id="combo" aria-hidden="true"><b id="combo-x">×1.0</b><span id="combo-lbl">risque</span></div>
 
+<!-- carton d'entrée de figure : mythe + verset -->
+<div id="intro" aria-hidden="true">
+  <div class="in-z"><span id="in-num">I</span><b id="in-name">LABYRINTHE</b></div>
+  <div id="in-lvl">figure 1</div>
+  <p id="in-epi"></p>
+</div>
+
 <div id="splash" aria-hidden="true">
   <div class="sp-in">
     <div class="sp-logo"><em>◆</em>POINT</div>
-    <div class="sp-tag">tenez · ramassez · mutez</div>
+    <div class="sp-tag">sept mythes · soixante-dix figures</div>
     <div class="sp-bar"><i></i></div>
   </div>
 </div>
@@ -391,23 +437,23 @@ button.go.big{font-size:13px;min-height:60px;letter-spacing:.24em}
     </span>
   </div>
   <div class="home-hero">
-    <span class="home-kicker">campagne — 7 zones · 70 niveaux</span>
-    <h1 class="home-title">TENEZ.<br>RAMASSEZ.<br><span style="color:var(--chaud)">MUTEZ.</span></h1>
-    <p class="home-sub">Le motif tourne, tout est blanc. <b>Des couches virent au bleu au fil du niveau</b> — les bleues tuent. Frôlez-les pour monter votre combo, ramassez les carrés, mutez la formule.</p>
+    <span class="home-kicker">une formule · sept monstres · soixante-dix figures</span>
+    <h1 class="home-title">TENEZ.<br>RECUEILLEZ.<br><span style="color:var(--chaud)">RÉÉCRIVEZ.</span></h1>
+    <p class="home-sub">Une seule formule dessine tout : le Labyrinthe, Méduse, Charybde… <b>Des couches du motif virent au bleu</b> — le bleu tue. Frôlez-le pour monter votre combo, recueillez les tessères, consultez l'Oracle, trouvez la Porte.</p>
   </div>
-  <button class="go big" id="btn-play">jouer<small id="play-sub">niveau 1 · zone éveil</small></button>
+  <button class="go big" id="btn-play">jouer<small id="play-sub">figure 1 · I labyrinthe</small></button>
   <div class="home-stats">
-    <div><b id="hs-lvl">0<small style="font-size:10px;color:var(--dimmer)">/70</small></b><span>niveaux</span></div>
+    <div><b id="hs-lvl">0<small style="font-size:10px;color:var(--dimmer)">/70</small></b><span>figures</span></div>
     <div><b id="hs-stars">0<small style="font-size:10px;color:var(--dimmer)">/210</small></b><span>étoiles</span></div>
     <div><b id="hs-best">0</b><span>meilleur score</span></div>
 
   </div>
   <nav class="home-nav" aria-label="navigation principale">
-    <button id="btn-levels"><svg class="ico" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg><span>niveaux</span></button>
-    <button id="btn-profile"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l7.8 9-7.8 9-7.8-9L12 3z"/></svg><span>profil</span></button>
+    <button id="btn-levels"><svg class="ico" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg><span>figures</span></button>
+    <button id="btn-profile"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l7.8 9-7.8 9-7.8-9L12 3z"/></svg><span>pilote</span></button>
     <button id="btn-help"><svg class="ico" viewBox="0 0 24 24"><path d="M9.2 9a3 3 0 115.1 2.1c-.9.9-2.3 1.4-2.3 3v.5"/><circle cx="12" cy="18.6" r=".5"/><circle cx="12" cy="12" r="10" opacity=".35"/></svg><span>aide</span></button>
   </nav>
-  <p class="home-foot">7 zones · 70 niveaux · <span id="foot-ver">v10</span></p>
+  <p class="home-foot">7 mythes · 70 figures · <span id="foot-ver">v14</span></p>
 </div></div>
 
 <div class="scr" id="s-profile"><div class="card">
@@ -415,7 +461,7 @@ button.go.big{font-size:13px;min-height:60px;letter-spacing:.24em}
     <button class="back" id="profile-back" aria-label="retour"><svg class="ico" viewBox="0 0 24 24"><path d="M14.5 5l-7 7 7 7"/></svg></button></div>
   <div class="pf-head">
     <div class="pf-dmd"><b>P</b></div>
-    <h2 style="display:contents"><div class="pf-name" id="pf-name">Recrue</div><div class="pf-rank" id="pf-rank">grade 1</div></div>
+    <h2 style="display:contents"><div class="pf-name" id="pf-name">Point</div><div class="pf-rank" id="pf-rank">grade 1</div></h2>
   </div>
   <div class="stats" style="margin-bottom:18px">
     <div>zones<b id="pf-zones-done">0/7</b></div>
@@ -429,39 +475,50 @@ button.go.big{font-size:13px;min-height:60px;letter-spacing:.24em}
 <div class="scr" id="s-help"><div class="card">
   <div class="eyebrow"><span>comment jouer</span>
     <button class="back" id="help-back" aria-label="retour"><svg class="ico" viewBox="0 0 24 24"><path d="M14.5 5l-7 7 7 7"/></svg></button></div>
-  <h1 style="font-size:26px;margin-bottom:14px">Aide</h1>
+  <h1 style="font-size:26px;margin-bottom:6px">Aide</h1>
+  <p style="margin-bottom:10px">Une seule formule dessine tous les monstres. Vous êtes le seul point qu'elle n'a pas écrit.</p>
   <div class="help-grid">
     <div class="help-ico" style="color:var(--chaud)">◆</div>
-    <div class="help-t"><b>Vous êtes le losange ambré</b>
-      <span>Touchez ou glissez : le vaisseau s'y rend avec de l'élan. Le mouvement est fluide — anticipez.</span></div>
+    <div class="help-t"><b>Vous êtes le Point</b>
+      <span>Touchez ou glissez : le losange ambré s'y rend avec de l'élan et laisse derrière lui un fil — le fil d'Ariane. Le mouvement est fluide : anticipez.</span></div>
   </div>
   <div class="help-grid">
     <div class="help-ico" style="color:var(--froid)">●</div>
     <div class="help-t"><b>Le motif se corrompt</b>
-      <span>Tout est blanc au départ. Avant de virer au bleu, une couche <b>clignote</b> — c'est votre fenêtre pour bouger. Une fois bleue, elle tue. Frôler un bleu sans mourir = <b style="color:var(--chaud)">near-miss</b> : score bonus et combo qui monte (jusqu'à ×3). Le combo fond si vous jouez prudent, et saute si vous êtes touché.</span></div>
+      <span>Tout est blanc au départ. Avant de virer au bleu, une couche <b>clignote</b> — c'est votre fenêtre pour bouger. Une fois bleue, elle tue. Frôler un bleu sans mourir = <b style="color:var(--chaud)">frôlé</b> : points et combo qui monte (jusqu'à ×3). Le combo fond si vous jouez prudent, et saute si vous êtes touché.</span></div>
   </div>
   <div class="help-grid">
     <div class="help-ico" style="color:var(--chaud)">▢</div>
-    <div class="help-t"><b>Ramassez les carrés ambrés</b>
-      <span>Ils remplissent la jauge de mutation. Dans l'Éveil ils sont là dès le départ ; plus tard ils apparaissent un à un, et en fin de campagne ils s'évanouissent si vous tardez.</span></div>
+    <div class="help-t"><b>Les tessères</b>
+      <span>Des carrés ambrés gravés d'un losange. Recueillez-en assez pour appeler l'Oracle. Dans le Labyrinthe elles sont là d'emblée ; plus tard elles apparaissent une à une, et en fin de campagne elles s'évanouissent si vous tardez.</span></div>
   </div>
   <div class="help-grid">
     <div class="help-ico" style="color:var(--vert)">⬡</div>
-    <div class="help-t"><b>L'hexagone vert mute la formule</b>
-      <span>Jauge pleine, il apparaît. Touchez-le : le jeu se fige et vous choisissez une mutation — purifier une couche bleue (vert) ou l'envenimer pour plus d'étoiles (ambre).</span></div>
+    <div class="help-t"><b>L'Oracle réécrit la formule</b>
+      <span>L'hexagone vert apparaît quand la jauge est pleine. Touchez-le : le motif se fige et vous choisissez une mutation — <b style="color:#8fd6f5">apaiser</b> (une couche bleue redevient blanche) ou <b style="color:var(--chaud)">envenimer</b> (+600 points, une couche de plus vire au bleu).</span></div>
+  </div>
+  <div class="help-grid">
+    <div class="help-ico" style="color:#FFE2B0">⊓</div>
+    <div class="help-t"><b>La Porte</b>
+      <span>Après le dernier oracle d'une figure, une porte de lumière s'ouvre à l'autre bout de l'arène. Franchissez-la pour résoudre la figure. Chaque dixième figure est une <b>épreuve</b> : pas de Porte, il faut tenir jusqu'à ce que le monstre se lasse.</span></div>
+  </div>
+  <div class="help-grid">
+    <div class="help-ico" style="color:#c9a0ff">◉</div>
+    <div class="help-t"><b>Les règles des monstres</b>
+      <span>Chaque mythe ajoute la sienne : le <b>Regard</b> de Méduse pétrifie si vous restez dans son cône, le <b>Gouffre</b> de Charybde vous attire, l'<b>Étau</b> des Moires resserre l'arène, la <b>Pénombre</b> d'Argos éteint tout hors de votre lumière… Elles sont annoncées avant chaque figure.</span></div>
   </div>
   <div class="help-grid">
     <div class="help-ico" style="color:var(--ink)">★</div>
-    <div class="help-t"><b>Trois étoiles par niveau</b>
-      <span>Survivre sans perdre de vie, utiliser un bonus, battre le seuil de score. Votre record est affiché avant chaque niveau.</span></div>
+    <div class="help-t"><b>Trois étoiles par figure</b>
+      <span><b>Intact</b> : aucune vie perdue. <b>Score</b> : dépasser le seuil affiché. <b>Audace</b> : choisir une mutation ambrée, ou pousser le combo à ×2.</span></div>
   </div>
   <button class="go" id="help-go" style="margin-top:16px">c'est compris</button>
 </div></div>
 
 <div class="scr" id="s-levels"><div class="card">
-  <div class="eyebrow"><span>campagne — 7 zones × 10 niveaux</span>
+  <div class="eyebrow"><span>campagne — 7 mythes × 10 figures</span>
     <button class="back" id="levels-back" aria-label="retour"><svg class="ico" viewBox="0 0 24 24"><path d="M14.5 5l-7 7 7 7"/></svg></button></div>
-  <h1 style="font-size:26px">Niveaux</h1>
+  <h1 style="font-size:26px">Figures</h1>
   <p id="prog" style="margin-bottom:14px"></p>
   <div class="zones" id="zones"></div>
 </div></div>
@@ -473,37 +530,40 @@ button.go.big{font-size:13px;min-height:60px;letter-spacing:.24em}
   <div class="setrow"><span>sons</span><button class="sw" id="sw-sound" role="switch" aria-checked="true" aria-label="sons"></button></div>
   <div class="setrow"><span>vibrations</span><button class="sw" id="sw-haptic" role="switch" aria-checked="true" aria-label="vibrations"></button></div>
   <div class="setrow"><span>effacer la progression</span><button id="btn-wipe" style="min-height:44px;padding:11px 16px;color:var(--froid)">effacer</button></div>
-  <div class="setrow"><span>tests : débloquer les 70 niveaux</span><button id="btn-unlock" style="min-height:44px;padding:11px 16px">débloquer</button></div>
+  <div class="setrow"><span>tests : débloquer les 70 figures</span><button id="btn-unlock" style="min-height:44px;padding:11px 16px">débloquer</button></div>
 </div></div>
 
 <div class="scr" id="s-brief"><div class="card">
   <div class="eyebrow"><span id="brief-zone">zone</span>
     <button class="back" id="brief-back" aria-label="retour"><svg class="ico" viewBox="0 0 24 24"><path d="M14.5 5l-7 7 7 7"/></svg></button></div>
-  <h1 style="font-size:30px">Niveau <span id="brief-num" style="color:var(--chaud)">1</span><small id="brief-name"></small></h1>
+  <h1 style="font-size:30px"><span id="brief-kind">Figure</span> <span id="brief-num" style="color:var(--chaud)">1</span><small id="brief-name"></small></h1>
+  <p class="epi" id="brief-epi"></p>
   <div class="how" id="brief-mods"></div>
   <div class="stats">
     <div>objectif<b id="brief-goal"></b></div>
-    <div>durée<b id="brief-time"></b></div>
-    <div>densité<b id="brief-density"></b></div>
+    <div><span id="brief-time-lbl">oracles</span><b id="brief-time"></b></div>
+    <div>seuil&nbsp;★<b id="brief-density"></b></div>
     <div>record<b id="brief-best">—</b></div>
   </div>
-  <button class="go" id="brief-go">démarrer</button>
+  <div class="stars sm" id="brief-stars"><i></i><i></i><i></i></div>
+  <button class="go" id="brief-go">entrer</button>
 </div></div>
 
 <div class="scr" id="s-patch"><div class="card">
-  <div class="eyebrow">le motif est figé — choisissez une mutation</div>
+  <div class="eyebrow">le motif est figé — l'Oracle parle</div>
   <div class="nowrow" style="display:grid;grid-template-columns:78px 1fr;gap:14px;align-items:center;margin:8px 0 16px">
     <div><canvas id="prev-now" width="78" height="78" style="width:78px;height:78px;border:1px solid var(--line);background:#08080b"></canvas>
       <span style="display:block;text-align:center;font-size:10px;color:#9b97ae;margin-top:4px;letter-spacing:.16em">MAINTENANT</span></div>
-    <p style="margin:0;font-size:11.5px;line-height:1.65"><b style="color:var(--froid)">Bleu</b> = plus facile.
-      <b style="color:var(--chaud)">Ambre</b> = plus dur, plus d'étoiles.<br>L'effet dure jusqu'à la fin du niveau.</p>
+    <p style="margin:0;font-size:11.5px;line-height:1.65">Trois réécritures de la formule. <b style="color:var(--froid)">Bleu</b> apaise : une couche bleue redevient blanche.
+      <b style="color:var(--chaud)">Ambre</b> envenime : +600 points, une couche de plus, l'étoile d'audace.<br>L'effet dure jusqu'à la Porte.</p>
   </div>
   <div class="picks" id="picks" style="display:grid;gap:9px"></div>
 </div></div>
 
 <div class="scr" id="s-pause"><div class="card">
-  <div class="eyebrow">boucle suspendue</div>
-  <h1 style="font-size:26px;margin-bottom:14px">Pause</h1>
+  <div class="eyebrow">le motif retient son souffle</div>
+  <h1 style="font-size:26px;margin-bottom:8px">Pause</h1>
+  <p id="pause-obj" style="text-align:center;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)"></p>
   <div id="pause-stars"><i></i><i></i><i></i><span style="font-size:11px;color:var(--dim);
     letter-spacing:.14em;align-self:center;margin-left:8px">étoiles en jeu</span></div>
   <div class="rowbtn">
@@ -516,17 +576,18 @@ button.go.big{font-size:13px;min-height:60px;letter-spacing:.24em}
 </div></div>
 
 <div class="scr" id="s-win"><div class="card">
-  <div class="eyebrow"><span>formule domptée</span></div>
-  <h1 style="font-size:30px">Niveau réussi</h1>
+  <div class="eyebrow"><span id="win-eyebrow">la Porte franchie</span></div>
+  <h1 style="font-size:30px" id="win-title">Figure résolue</h1>
   <div class="stars" id="win-stars"></div>
+  <div class="crit" id="win-crit"></div>
   <p id="win-best" style="text-align:center;font-size:11px;letter-spacing:.18em;
     text-transform:uppercase;min-height:14px;color:#c9c5da"></p>
   <div class="stats">
     <div>score<b id="w-score">0</b></div>
     <div>temps<b id="w-time">0s</b></div>
-    <div>bonus<b id="w-patch">0</b></div>
+    <div>frôlés<b id="w-patch">0</b></div>
   </div>
-  <button class="go" id="next">niveau suivant</button>
+  <button class="go" id="next">figure suivante</button>
   <div class="rowbtn" style="margin-top:8px">
     <button id="win-replay">rejouer</button>
     <button id="win-map">carte</button>
@@ -534,12 +595,12 @@ button.go.big{font-size:13px;min-height:60px;letter-spacing:.24em}
 </div></div>
 
 <div class="scr" id="s-over"><div class="card">
-  <div class="eyebrow"><span>la boucle vous a rattrapé</span></div>
-  <h1 style="font-size:30px;color:#FF6B5E">Échec</h1>
+  <div class="eyebrow"><span id="over-eyebrow">le motif vous a repris</span></div>
+  <h1 style="font-size:30px;color:#FF6B5E">Effacé</h1>
   <div class="stats">
     <div>score<b id="f-score">0</b></div>
     <div>temps<b id="f-time">0s</b></div>
-    <div>objectif<b id="f-goal">—</b></div>
+    <div>atteint<b id="f-goal">—</b></div>
   </div>
   <button class="go" id="retry">réessayer</button>
   <div class="rowbtn" style="margin-top:8px">
@@ -550,7 +611,7 @@ button.go.big{font-size:13px;min-height:60px;letter-spacing:.24em}
 
 <div class="toast" id="toast"></div>
 <div id="ver" style="position:fixed;right:calc(6px + var(--safe-r));bottom:calc(4px + var(--safe-b));
-  font-size:8px;letter-spacing:.2em;color:#3c3a48;pointer-events:none;z-index:50">v10</div>
+  font-size:8px;letter-spacing:.2em;color:#3c3a48;pointer-events:none;z-index:50">v14</div>
 <pre id="errbox" style="display:none;position:fixed;left:8px;top:calc(8px + var(--safe-t));z-index:9999;
   background:#2a0a0a;color:#ff9a9a;font:10px/1.4 var(--mono);padding:10px;max-width:90vw;
   white-space:pre-wrap;border:1px solid #ff5a5a"></pre>
@@ -566,8 +627,18 @@ window.addEventListener("error",e=>{
 "use strict";
 const $=id=>document.getElementById(id);
 const COARSE=matchMedia("(pointer:coarse)").matches;
-const buzz=p=>{ if(!HAPTIC.muted) try{navigator.vibrate?.(p);}catch(_){}};
 const HAPTIC={get muted(){ try{return localStorage.getItem("point_haptic")==="0";}catch(_){return false;} }};
+/* haptique : plugin Capacitor si présent (iOS n'a pas navigator.vibrate), sinon API web */
+const CapHap=window.Capacitor?.Plugins?.Haptics||null;
+const buzz=p=>{
+  if(HAPTIC.muted) return;
+  if(CapHap){
+    const arr=Array.isArray(p)?p:[p], m=Math.max(...arr);
+    try{ CapHap.impact({style:m>=40?"HEAVY":m>=18?"MEDIUM":"LIGHT"}).catch(()=>{}); }catch(_){}
+    return;
+  }
+  try{navigator.vibrate?.(p);}catch(_){}
+};
 
 /* ═══ sauvegarde ═══ */
 const SAVE={
@@ -607,7 +678,19 @@ Sfx.loadMuted();
 /* ═══ canvas / arène ═══ */
 const cv=$("cv"), ctx=cv.getContext("2d",{alpha:false});
 let W,H,rs,img,b8,b32,A,ax,ay,fx,fy,s;
-const BG=0xFF090909;
+const BG_IDLE=0xFF090909;
+let BG=BG_IDLE, BGR=9,BGG=9,BGB=9;      // fond teinté par zone (ABGR little-endian)
+function hsl2rgb(h,sl,l){
+  h=((h%360)+360)%360; const c=(1-Math.abs(2*l-1))*sl, x=c*(1-Math.abs((h/60)%2-1)), m=l-c/2;
+  let r,g,b;
+  if(h<60){r=c;g=x;b=0;}else if(h<120){r=x;g=c;b=0;}else if(h<180){r=0;g=c;b=x;}
+  else if(h<240){r=0;g=x;b=c;}else if(h<300){r=x;g=0;b=c;}else{r=c;g=0;b=x;}
+  return [Math.round((r+m)*255),Math.round((g+m)*255),Math.round((b+m)*255)];
+}
+function setZoneBG(hue){
+  [BGR,BGG,BGB]=hsl2rgb(hue,.32,.028);
+  BG=(0xFF<<24|BGB<<16|BGG<<8|BGR)>>>0;
+}
 function resize(){
   const vv=window.visualViewport;
   const cw=Math.round(vv?vv.width:innerWidth), ch=Math.round(vv?vv.height:innerHeight);
@@ -632,13 +715,19 @@ let t=0, elapsed=0, score=0, mult=1, lives=3, charge=0, tokensGot=0,
     inv=0, flash=0, waveTimer=0, patchCount=0, shake=0, safeScale=1,
     hotMask=[], tokens=[], orb=null, ripples=[];
 let tokenSpawnT=0;
+/* la Porte (sortie des figures normales), le Regard, la Pénombre */
+let door=null, doorT=0;
+const GAZE={ang:0,dir:1,pet:0,on:false};   // pet = pétrification 0..1
+const ECL={r:0,on:false};                  // rayon de lumière (px)
+let dared=false, maxMul=1, nearCount=0;    // étoile « audace »
+let hintT=0;                               // conseils contextuels (figure I)
 const ORDER=[0,8,4,12,2,10,6,14,1,9,5,13,3,11,7,15];
 const ship={x:0,y:0,tx:0,ty:0,vx:0,vy:0};
 const ptrs=new Map(); let lastPtr=null;
 const keys=new Set();
 let toastT=0;
 /* game feel */
-let slowmo=1, freezeT=0, hitstop=0, bestScore=0, nearFlash=0, comboT=0;
+let slowmo=1, freezeT=0, hitstop=0, bestScore=0, nearFlash=0, comboT=0, comboMsg="";
 const parts=[], sparks=[];
 const shipTrail=[];
 let near={t:0,k:0};
@@ -655,7 +744,7 @@ function makeField(){
 function sampleXY(i,t,fn){
   const q=(fn||fieldFn)(i,t); if(!q) return null;
   const [x,y]=applyMotion(q[0],q[1],i,t,L.motion);
-  return applyMods(x,y,i,t,{mods:L.mods});
+  return applyMods(x,y,i,t,L.mods);
 }
 /* gain d'échelle par famille : classic a une amplitude native ±136,
    les autres familles travaillent en disque unitaire → on les remonte */
@@ -710,15 +799,27 @@ function spawnOrb(){
     x:fx,y:fy,trail:[],born:0
   };
 }
+/* la Porte : apparaît à l'opposé du vaisseau, dérive lentement en orbite */
+function spawnDoor(){
+  const a=Math.atan2(ship.y-fy,ship.x-fx)+Math.PI+(Math.random()-.5)*1.1;
+  door={ang:a,rad:A*0.355,spd:(L.doorSpeed||.12)*(Math.random()<.5?1:-1),
+        x:fx+Math.cos(a)*A*0.355,y:fy+Math.sin(a)*A*0.355,born:0,tau:0};
+  toast("la Porte s'ouvre — franchissez-la");
+  Sfx.door(); buzz([14,30,14]);
+  ringWave(door.x,door.y,A*.5,"38",.9);
+}
 
 /* ressort vaisseau */
 const K_R=90,C_A=13.4;
 function stepShip(h){
-  ship.vx+=((ship.tx-ship.x)*K_R-ship.vx*C_A)*h;
-  ship.vy+=((ship.ty-ship.y)*K_R-ship.vy*C_A)*h;
-  /* gravité (mod marée) */
+  /* pétrification (Regard) : ressort plus mou, plus amorti */
+  const pet=GAZE.on?GAZE.pet:0;
+  const k=K_R*(1-.72*pet), c=C_A*(1+1.6*pet);
+  ship.vx+=((ship.tx-ship.x)*k-ship.vx*c)*h;
+  ship.vy+=((ship.ty-ship.y)*k-ship.vy*c)*h;
+  /* gouffre : le centre attire */
   if(L&&L.mods.includes("gravity")){
-    ship.vx+=(fx-ship.x)*0.25*h*60/60; ship.vy+=(fy-ship.y)*0.25*h;
+    ship.vx+=(fx-ship.x)*0.25*h; ship.vy+=(fy-ship.y)*0.25*h;
   }
   ship.x+=ship.vx*h; ship.y+=ship.vy*h;
   const pad=(A*(1-safeScale))/2;
@@ -735,33 +836,59 @@ function startLevel(n){
   L=LEVELS[n]; P=makeParams(L.fam); fieldFn=makeField();
   t=Math.random()*100; elapsed=0; score=0; mult=1; lives=3; charge=0; tokensGot=0;
   inv=2.5; flash=0; waveTimer=0; patchCount=0; shake=0; safeScale=1;
-  orb=null; ripples=[]; previews=[];
+  orb=null; door=null; doorT=0; ripples=[]; previews=[]; lastObj="";
   parts.length=0; sparks.length=0; shipTrail.length=0;
   slowmo=1; freezeT=0; hitstop=0; nearFlash=0; near={t:0,k:0};
   RISK.val=0; RISK.mul=1; RISK.timer=0;
+  dared=false; maxMul=1; nearCount=0; hintT=L.idx===0?3.2:0;
+  GAZE.on=L.mods.includes("gaze"); GAZE.ang=Math.random()*6.283; GAZE.dir=1; GAZE.pet=0;
+  ECL.on=L.mods.includes("eclipse"); ECL.r=A*.55;
+  setZoneBG(ZONES[L.zone].hue);
+  showIntro(L);
   bestScore=SAVE.best(L.idx);
   hotMask=Array(P.layers||16).fill(false);
   warnMask=Array(P.layers||16).fill(false);
   warnAge=Array(P.layers||16).fill(0);
-  corruptStack=[]; warns=[]; corruptT=L.firstDelay||5.5;
+  corruptStack=[]; warns=[]; corruptT=Math.max(3.8,L.firstDelay||5.5);   // rien ne vire au bleu pendant le carton
   tokenSpawnT=L.tokenDelay||0;
   if(!L.tokenDelay){
     tokens=[newToken(),newToken()];
     tokens.forEach(tk=>tk.born=1);
   } else tokens=[];
   ship.x=ship.tx=fx; ship.y=ship.ty=fy+A*0.33; ship.vx=ship.vy=0;
-  $("objtxt").textContent = L.timeLimit
-    ? `tenez ${L.timeLimit}s`
-    : `${L.tokensNeeded} carrés → hexagone`;
+  $("obj").classList.toggle("boss",!!L.timeLimit);
   showScreen(null); $("hud").classList.add("on");
   Sfx.music.setZone(ZONES[L.zone].hue); Sfx.music.setIntensity(.35+L.diff*.5);
   Sfx.music.start();
-  state="play"; last=performance.now(); Sfx.unlock(); paintHUD();
+  state="play"; last=performance.now(); Sfx.unlock(); paintHUD(); holdAwake();
+}
+
+/* carton d'entrée : mythe, figure, verset */
+let introTimer=0;
+function showIntro(lv){
+  const z=ZONES[lv.zone], el=$("intro");
+  $("in-num").textContent=z.num;
+  $("in-name").textContent=lv.boss?z.boss:z.myth;
+  $("in-lvl").textContent=lv.boss?`épreuve · figure ${lv.num}`:`figure ${lv.num}`;
+  $("in-epi").textContent=lv.boss?z.bossLine:z.epigraph;
+  el.style.setProperty("--zh",z.hue);
+  el.classList.remove("on"); void el.offsetWidth; el.classList.add("on");
+  clearTimeout(introTimer); introTimer=setTimeout(()=>el.classList.remove("on"),3400);
 }
 
 /* ═══ HUD ═══ */
 function pips(el,n,tot,cls){ el.innerHTML="";
   for(let i=0;i<tot;i++){const d=document.createElement("i");d.className="pip"+(i<n?" "+cls:"");el.appendChild(d);} }
+let lastObj="";
+function objective(){
+  if(!L) return "";
+  if(L.timeLimit) return `tenez encore <b>${Math.max(0,Math.ceil(L.timeLimit-elapsed))} s</b>`;
+  if(door) return `franchissez <b>la Porte</b>`;
+  if(doorT>0) return `<b>la Porte</b> s'ouvre…`;
+  if(orb) return `rejoignez <b>l'Oracle</b>`;
+  const more=L.oracles>1?` · oracle ${patchCount+1}/${L.oracles}`:"";
+  return `tessères <b>${charge}/${L.tokensNeeded}</b>${more}`;
+}
 function paintHUD(){
   $("score").textContent=Math.floor(score).toLocaleString("fr-FR");
   $("mult").textContent="×"+RISK.mul.toFixed(2);
@@ -770,7 +897,9 @@ function paintHUD(){
   pips($("charge"),charge,L.tokensNeeded,"charge");
   const ok=charge>=L.tokensNeeded;
   $("chargelbl").classList.toggle("on",ok);
-  $("chargelbl").textContent=ok?"prêt":"bonus";
+  $("chargelbl").textContent=ok?"oracle":"tessères";
+  const o=objective();
+  if(o!==lastObj){ lastObj=o; $("objtxt").innerHTML=o; }
 }
 const toast=m=>{ $("toast").textContent=m; $("toast").classList.add("on"); toastT=1.6; };
 
@@ -805,10 +934,11 @@ function detectNearMiss(hitXs){
   const now=performance.now();
   if(now-(near.t||0)>420){
     near.t=now; near.k=best;
-    const pts=Math.round((25+75*best)*RISK.mul*mult);
-    score+=pts;
+    const pts=Math.round((25+75*best)*RISK.mul);
+    score+=pts; nearCount++;
     RISK.val=Math.min(1,RISK.val+.16); RISK.timer=4;
     recomputeMult();
+    if(RISK.mul>=2&&!dared){ dared=true; toast("audace — ×2"); }
     Sfx.near(best); buzz(Math.max(8,26*best|0));
     nearFlash=.85;
     ringWave(bx,by,34*rs,"#5FD3FF",.42);
@@ -818,6 +948,7 @@ function detectNearMiss(hitXs){
 function recomputeMult(){
   mult=1+RISK.val*2;
   RISK.mul=1+RISK.val*2;
+  if(RISK.mul>maxMul) maxMul=RISK.mul;
 }
 
 /* ═══ boucle ═══ */
@@ -841,6 +972,39 @@ function frame(now){
       if(L.mods.includes("storm")&&Math.random()<dt*0.32) shake=0.28+Math.random()*0.22;
       if(L.mods.includes("shrink")) safeScale=0.78+0.22*Math.abs(Math.sin(elapsed*0.28));
 
+      /* le Regard : un cône balaie l'arène ; y rester pétrifie */
+      if(GAZE.on){
+        GAZE.ang+=dt*(L.gazeSpeed||.4)*GAZE.dir;
+        if(Math.random()<dt*0.06) GAZE.dir=-GAZE.dir;
+        const r=Math.hypot(ship.x-fx,ship.y-fy);
+        let inside=r<20*rs;
+        if(!inside){
+          let da=Math.atan2(ship.y-fy,ship.x-fx)-GAZE.ang;
+          da=Math.atan2(Math.sin(da),Math.cos(da));
+          inside=Math.abs(da)<(L.gazeWidth||.35)/2;
+        }
+        const before=GAZE.pet;
+        GAZE.pet=clamp(GAZE.pet+(inside?dt/1.1:-dt/.7),0,1);
+        if(inside&&before<.35&&GAZE.pet>=.35){ Sfx.stone(); buzz(10); if(elapsed<20) toast("pétrifié — quittez le regard"); }
+      }
+      /* la Pénombre : la lumière se referme autour du vaisseau */
+      if(ECL.on){
+        const k=.5+.5*Math.cos(elapsed*6.283/9.5);
+        ECL.r=A*lerp(L.eclipseMin||.3,.56,k);
+      }
+      /* la Porte s'ouvre un instant après le dernier oracle, puis dérive */
+      if(doorT>0&&(doorT-=dt)<=0&&!door) spawnDoor();
+      if(door){
+        door.tau+=dt; door.born=Math.min(1,door.born+dt*1.6);
+        door.ang+=dt*door.spd;
+        const R=door.rad*(1+.04*Math.sin(door.tau*1.3));
+        door.x=fx+Math.cos(door.ang)*R; door.y=fy+Math.sin(door.ang)*R;
+      }
+      /* conseils de la première figure */
+      if(hintT>0&&(hintT-=dt)<=0){
+        if(L.idx===0&&tokensGot===0) toast("glissez le doigt — ramassez les carrés ambrés");
+      }
+
       /* décroissance du risque : le multiplicateur fond si on joue prudent */
       if(RISK.timer>0)RISK.timer-=dt;
       else if(RISK.val>0){ RISK.val=Math.max(0,RISK.val-dt*.22); recomputeMult(); }
@@ -859,9 +1023,9 @@ function frame(now){
         if(warns[i].age>=warnDur()){ finalizeWarn(warns[i]); warns.splice(i,1); }
       }
 
-      /* carrés ambrés : présents d'emblée en zone 1, apparition (et TTL) plus tard */
+      /* tessères : présentes d'emblée en zone I, apparition (et TTL) plus tard */
       if(L.tokenDelay){
-        const cap=charge>=L.tokensNeeded||orb?0:2;
+        const cap=charge>=L.tokensNeeded||orb||door?0:2;
         if(tokens.length<cap){
           tokenSpawnT-=dt;
           if(tokenSpawnT<=0){
@@ -883,9 +1047,20 @@ function frame(now){
       /* musique pilotée par le danger réel */
       Sfx.music.setIntensity(Math.min(1,.3+L.diff*.45+RISK.val*.45));
     }
-    /* victoire par temps (boss) */
+    /* victoire par temps (épreuve) */
     if(L.timeLimit&&elapsed>=L.timeLimit){ winLevel(); }
-    /* échec par temps ? non — pas de limite basse */
+    /* victoire par la Porte (figures normales) */
+    if(door&&door.born>=1&&state==="play"){
+      const dx=door.x-ship.x,dy=door.y-ship.y;
+      if(dx*dx+dy*dy<(24*rs)**2){
+        score+=Math.round(400*RISK.mul);
+        freezeT=.32; slowmo=1;
+        burst(door.x,door.y,50,300*rs,38,.9);
+        burst(door.x,door.y,30,200*rs,48,.7);
+        ringWave(door.x,door.y,A*.8,"38",.8);
+        winLevel();
+      }
+    }
 
     for(let j=ripples.length;j--;) if((ripples[j].age+=dt)>.55) ripples.splice(j,1);
     if(orb){
@@ -920,7 +1095,7 @@ function frame(now){
     if(sparks[j].age>=sparks[j].dur) sparks.splice(j,1);
   }
   if(shipTrail.length&&(state!=="play"||Math.hypot(ship.vx,ship.vy)<26)){
-    shipTrail.shift();
+    shipTrail.splice(0,2);
   }
   if(nearFlash>0)nearFlash-=rdt*1.8;
 
@@ -931,8 +1106,8 @@ function frame(now){
     x.textContent="×"+RISK.mul.toFixed(2);
     el.classList.toggle("hot",RISK.val>=.55&&RISK.val<.85);
     el.classList.toggle("fire",RISK.val>=.85);
-    $("combo-lbl").textContent=RISK.val>=.55?"risque !":"frôlé";
-  } else $("combo").classList.remove("on");
+    $("combo-lbl").textContent=comboMsg||(RISK.val>=.55?"risque !":"frôlé");
+  } else { $("combo").classList.remove("on"); comboMsg=""; }
 
   if(toastT>0&&(toastT-=rdt)<=0)$("toast").classList.remove("on");
   try{ render(); }catch(err){ console.error(err); }
@@ -949,12 +1124,13 @@ window.addEventListener("error",()=>{
 
 /* ═══ rendu ═══ */
 function render(){
+  if(!L){ b32.fill(BG_IDLE); drawIdle(); ctx.putImageData(img,0,0); drawChromeIdle(); return; }
   b32.fill(BG);
-  if(!L){ drawIdle(); ctx.putImageData(img,0,0); drawChromeIdle(); return; }
 
-  const cx=fx,cy=fy,hitR2=(7*rs)**2;
+  const cx=fx,cy=fy,hitR2=(7*rs)**2,nearR2=(21*rs)**2;
   const n=L.density|0;
   const szA=Math.max(1,Math.round(rs)), szH=Math.max(2,Math.round(2.6*rs));
+  const szB=szH+2*Math.max(1,Math.round(rs));           // halo des points chauds
   const live=state==="play"&&inv<=0;
   let hit=false;
   nearPts.length=0;
@@ -968,19 +1144,18 @@ function render(){
     const layer=i%layers;
     const q=sampleXY(i,t);
     if(!q) continue;
-    const [mx,my]=q;
-    const X=cx+s*mx+ox, Y=cy+s*my+oy;
+    const X=cx+s*q[0]+ox, Y=cy+s*q[1]+oy;
     if(!(X>-1e5&&X<1e5&&Y>-1e5&&Y<1e5)) continue;
 
     const hot=hotMask[layer];
     const wrn=warnMask[layer];
     if(hot&&live){
-      const dx=X-ship.x,dy=Y-ship.y;
-      if(dx*dx+dy*dy<hitR2) hit=true;
-      else if(RISK.val>0&&dx*dx+dy*dy<(21*rs)**2) nearPts.push([X,Y]);
+      const dx=X-ship.x,dy=Y-ship.y,d2=dx*dx+dy*dy;
+      if(d2<hitR2) hit=true;
+      else if(d2<nearR2) nearPts.push([X,Y]);
     }
-    let sz=szA, al=.42, R=255, G=255;
-    if(hot){ sz=szH; al=.72; R=95; G=211; }
+    let sz=szA, al=.42, R=255, G=255, B=255, glow=false;
+    if(hot){ sz=szH; al=.72; R=95; G=211; glow=true; }
     else if(wrn){
       const p=Math.min(1,warnAge[layer]/warnDur());
       const freq=3+p*8;
@@ -988,17 +1163,35 @@ function render(){
       const on=((elapsed*freq)%1)<duty;
       if(on){ sz=szH; al=.72; R=95; G=211; }
     }
+    if(glow){
+      /* halo doux autour des points bleus : lisibilité du danger */
+      const x0=(X|0)-(szB>>1),y0=(Y|0)-(szB>>1);
+      for(let dy=0;dy<szB;dy++){
+        const y=y0+dy;if(y<0||y>=H)continue;const base=y*W;
+        for(let dx=0;dx<szB;dx++){
+          const x=x0+dx;if(x<0||x>=W)continue;
+          const o=(base+x)<<2;
+          b8[o]+=(40-b8[o])*.10;b8[o+1]+=(150-b8[o+1])*.10;b8[o+2]+=(255-b8[o+2])*.10;
+        }
+      }
+    }
     const x0=(X|0)-(sz>>1),y0=(Y|0)-(sz>>1);
     for(let dy=0;dy<sz;dy++){
       const y=y0+dy;if(y<0||y>=H)continue;const base=y*W;
       for(let dx=0;dx<sz;dx++){
         const x=x0+dx;if(x<0||x>=W)continue;
         const o=(base+x)<<2;
-        b8[o]+=(R-b8[o])*al;b8[o+1]+=(G-b8[o+1])*al;b8[o+2]+=(255-b8[o+2])*al;
+        b8[o]+=(R-b8[o])*al;b8[o+1]+=(G-b8[o+1])*al;b8[o+2]+=(B-b8[o+2])*al;
       }
     }
   }
   ctx.putImageData(img,0,0);
+
+  /* sceau de la zone, vignette, Regard, Pénombre */
+  drawSigil(ZONES[L.zone]);
+  drawVignette();
+  if(GAZE.on) drawGaze();
+  if(ECL.on) drawEclipse();
 
   /* halo slow-mo quand un near-miss vient de tomber */
   if(nearFlash>0&&state==="play"){
@@ -1042,28 +1235,39 @@ function render(){
       const left=L.tokenLife>0?Math.max(0,Math.min(1,(L.tokenLife-tk.age)/1.15)):1;
       const vis=fade*left;
       const r=9*rs*(.75+.25*vis);
-      ctx.save();ctx.globalAlpha=.25+.75*vis;ctx.translate(tk.x,tk.y);ctx.rotate(tk.rot);
-      ctx.fillStyle="rgba(255,180,84,.35)";ctx.fillRect(-r/2,-r/2,r,r);
+      const tp=.5+.5*Math.sin(performance.now()/380+tk.i);
+      ctx.save();ctx.globalAlpha=.25+.75*vis;
+      /* lueur */
+      const tg=ctx.createRadialGradient(tk.x,tk.y,0,tk.x,tk.y,r*2.4);
+      tg.addColorStop(0,`rgba(255,180,84,${.22+.1*tp})`);tg.addColorStop(1,"rgba(255,180,84,0)");
+      ctx.fillStyle=tg;ctx.fillRect(tk.x-r*2.4,tk.y-r*2.4,r*4.8,r*4.8);
+      ctx.translate(tk.x,tk.y);ctx.rotate(tk.rot);
+      ctx.fillStyle="rgba(255,180,84,.30)";ctx.fillRect(-r/2,-r/2,r,r);
       ctx.strokeStyle="#FFB454";ctx.lineWidth=1.5*rs;ctx.strokeRect(-r/2,-r/2,r,r);
+      /* la tessère : un losange gravé au centre */
+      ctx.rotate(Math.PI/4);ctx.fillStyle="rgba(255,236,200,.9)";
+      const q2=r*.28;ctx.fillRect(-q2/2,-q2/2,q2,q2);
       ctx.restore();
       if(state==="play"&&tk.born>=1){
         const dx=tk.x-ship.x,dy=tk.y-ship.y;
         if(dx*dx+dy*dy<(17*rs)**2){
           const x=tk.x,y=tk.y;
           tokensGot++;
-          const gain=Math.round(150*RISK.mul*mult);
+          const gain=Math.round(150*RISK.mul);
           score+=gain;buzz(12);Sfx.token();
           burst(x,y,14,150*rs,38,.55);
           ringWave(x,y,30*rs,"38",.4);
           comboT=1.1;$("combo").classList.add("on");
-          $("combo-lbl").textContent="+"+gain;
-          if(charge<L.tokensNeeded&&++charge===L.tokensNeeded){spawnOrb();buzz([20,40,20]);Sfx.orb();toast("foncez sur l'hexagone vert");}
+          comboMsg="+"+gain;
+          const oracleLeft=!door&&(L.timeLimit||patchCount<L.oracles);
+          if(oracleLeft&&charge<L.tokensNeeded&&++charge===L.tokensNeeded){spawnOrb();buzz([20,40,20]);Sfx.orb();toast("l'Oracle est là — rejoignez l'hexagone vert");}
+          else if(L.idx===0&&tokensGot===1) toast(`tessère ${charge}/${L.tokensNeeded}`);
           if(!L.tokenDelay) Object.assign(tk,newToken());
           else { tokens.splice(ti,1); tokenSpawnT=L.tokenGap||4; }
         }
       }
     }
-    /* orb bonus */
+    /* l'Oracle */
     if(orb){
       const pulse=.5+.5*Math.sin(performance.now()/250);
       const r=15*rs*(.35+.65*orb.born);
@@ -1072,8 +1276,17 @@ function render(){
         ctx.fillStyle=`rgba(95,230,138,${.03+q*.13})`;
         ctx.fillRect(orb.trail[j]-w/2,orb.trail[j+1]-w/2,w,w);
       }
+      const og=ctx.createRadialGradient(orb.x,orb.y,0,orb.x,orb.y,r*3.2);
+      og.addColorStop(0,`rgba(95,230,138,${.20+.08*pulse})`);og.addColorStop(1,"rgba(95,230,138,0)");
+      ctx.fillStyle=og;ctx.fillRect(orb.x-r*3.2,orb.y-r*3.2,r*6.4,r*6.4);
       ctx.strokeStyle=`rgba(95,230,138,${.14+.2*pulse})`;ctx.lineWidth=1.4*rs;
       ctx.beginPath();ctx.arc(orb.x,orb.y,r*(1.55+.3*pulse),0,7);ctx.stroke();
+      /* six satellites — les six sommets qui parlent */
+      ctx.fillStyle="rgba(95,230,138,.85)";
+      for(let j=0;j<6;j++){
+        const a=-orb.tau*1.6+j*Math.PI/3, rr=r*2.05;
+        const d=1.4*rs;ctx.fillRect(orb.x+Math.cos(a)*rr-d,orb.y+Math.sin(a)*rr-d,2*d,2*d);
+      }
       ctx.save();ctx.translate(orb.x,orb.y);ctx.rotate(orb.tau*.9);
       ctx.beginPath();
       for(let j=0;j<6;j++){const a=j*Math.PI/3,px=Math.cos(a)*r,py=Math.sin(a)*r;j?ctx.lineTo(px,py):ctx.moveTo(px,py);}
@@ -1087,6 +1300,8 @@ function render(){
         if(dx*dx+dy*dy<(26*rs)**2) openPatch();
       }
     }
+    /* la Porte */
+    if(door) drawDoor();
     /* ripples */
     for(const w of ripples){
       const q=w.age/.55;
@@ -1115,21 +1330,38 @@ function render(){
         shipTrail.push(ship.x,ship.y);
         if(shipTrail.length>44)shipTrail.splice(0,2);
       }
+      /* le fil d'Ariane : une ligne qui s'efface derrière le vaisseau */
       if(shipTrail.length>3){
-        for(let j=shipTrail.length-2;j>=0;j-=2){
-          const q=j/shipTrail.length, w=(1+q*4.4)*rs;
-          ctx.fillStyle=`rgba(255,180,84,${q*.16})`;
-          ctx.fillRect(shipTrail[j]-w/2,shipTrail[j+1]-w/2,w,w);
+        ctx.lineCap="round";
+        for(let j=shipTrail.length-2;j>=2;j-=2){
+          const q=j/shipTrail.length;
+          ctx.strokeStyle=`rgba(255,180,84,${q*.30})`;ctx.lineWidth=(0.6+q*2.6)*rs;
+          ctx.beginPath();ctx.moveTo(shipTrail[j-2],shipTrail[j-1]);ctx.lineTo(shipTrail[j],shipTrail[j+1]);ctx.stroke();
         }
+        ctx.lineCap="butt";
       }
+      const pet=GAZE.on?GAZE.pet:0;
+      /* lueur ambrée du vaisseau (grise si pétrifié) */
+      const gl=ctx.createRadialGradient(ship.x,ship.y,2*rs,ship.x,ship.y,30*rs);
+      gl.addColorStop(0,pet>.5?`rgba(190,186,200,${.22*(1-pet*.5)})`:"rgba(255,180,84,.24)");
+      gl.addColorStop(1,"rgba(255,180,84,0)");
+      ctx.fillStyle=gl;ctx.fillRect(ship.x-30*rs,ship.y-30*rs,60*rs,60*rs);
       ctx.save();ctx.translate(ship.x,ship.y);
       if(spd>4){ctx.rotate(Math.atan2(ship.vy,ship.vx)+Math.PI/2);ctx.scale(1-Math.min(.22,spd/9000),1+Math.min(.34,spd/6000));}
       /* pulse au tempo de la musique */
-      const pu=1+.09*(Sfx.music.pulse?Sfx.music.pulse():0)*(RISK.val*.7+.3);
+      const pu=1+.09*(Sfx.music.pulse?Sfx.music.pulse():0)*(RISK.val*.7+.3)*(1-pet);
       ctx.scale(pu,pu);
       const r=10*rs;
-      ctx.strokeStyle="#FFB454";ctx.lineWidth=1.6*rs;ctx.beginPath();
+      const col=pet>0?`rgb(${255-90*pet|0},${180+10*pet|0},${84+120*pet|0})`:"#FFB454";
+      ctx.strokeStyle=col;ctx.lineWidth=1.6*rs;ctx.beginPath();
       ctx.moveTo(0,-r);ctx.lineTo(r*.72,0);ctx.lineTo(0,r);ctx.lineTo(-r*.72,0);ctx.closePath();ctx.stroke();
+      ctx.fillStyle=pet>0?`rgba(200,196,212,${.10*pet})`:"rgba(255,180,84,.10)";ctx.fill();
+      if(pet>.3){
+        /* fissures de pierre */
+        ctx.strokeStyle=`rgba(230,228,240,${.7*pet})`;ctx.lineWidth=.9*rs;ctx.beginPath();
+        ctx.moveTo(-r*.1,-r*.6);ctx.lineTo(r*.15,-r*.1);ctx.lineTo(-r*.08,r*.35);
+        ctx.moveTo(r*.15,-r*.1);ctx.lineTo(r*.42,r*.05);ctx.stroke();
+      }
       ctx.restore();
       ctx.fillStyle="#fff";ctx.fillRect(ship.x-2*rs,ship.y-2*rs,4*rs,4*rs);
       if(RISK.val>.55){
@@ -1138,10 +1370,138 @@ function render(){
         const rr=(13+2.5*Math.sin(performance.now()/110))*rs;
         ctx.beginPath();ctx.arc(ship.x,ship.y,rr,0,7);ctx.stroke();
       }
+      if(pet>0){
+        /* anneau de pétrification qui se referme */
+        ctx.strokeStyle=`rgba(200,196,212,${.55*pet})`;ctx.lineWidth=1.4*rs;
+        ctx.beginPath();ctx.arc(ship.x,ship.y,16*rs,-Math.PI/2,-Math.PI/2+6.283*pet);ctx.stroke();
+      }
     }
+    /* épreuve : anneau de temps autour de l'arène */
+    if(L.timeLimit) drawBossRing();
   }
-  if(flash>0){ctx.fillStyle=`rgba(255,90,90,${flash*.34})`;ctx.fillRect(0,0,W,H);}
+  if(flash>0){
+    const fg=ctx.createRadialGradient(W/2,H/2,A*.25,W/2,H/2,A*.85);
+    fg.addColorStop(0,`rgba(255,90,90,${flash*.10})`);fg.addColorStop(1,`rgba(255,60,60,${flash*.55})`);
+    ctx.fillStyle=fg;ctx.fillRect(0,0,W,H);
+  }
   if(hit&&state==="play") damage();
+}
+
+/* ═══ éléments de scène ═══ */
+function zoneCol(a,l=70){ const z=ZONES[L.zone]; return `hsla(${z.hue},72%,${l}%,${a})`; }
+function drawVignette(){
+  const g=ctx.createRadialGradient(fx,fy,A*.42,fx,fy,Math.hypot(W,H)*.55);
+  g.addColorStop(0,"rgba(0,0,0,0)");g.addColorStop(1,"rgba(0,0,0,.62)");
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+}
+/* le sceau de la zone : un glyphe géométrique très discret qui tourne sous le motif */
+function drawSigil(z){
+  const R=A*.47, a=.06;
+  ctx.save();ctx.translate(fx,fy);ctx.strokeStyle=zoneCol(a);ctx.lineWidth=Math.max(1,rs*.8);
+  ctx.fillStyle=zoneCol(a);
+  const rot=t*.012;
+  switch(z.sigil){
+    case "maze":{ ctx.rotate(Math.PI/4+rot*.5);
+      for(let k=0;k<4;k++){const r=R*(.35+k*.2);ctx.beginPath();
+        ctx.moveTo(-r,-r);ctx.lineTo(r,-r);ctx.lineTo(r,r);ctx.lineTo(-r*.3,r);ctx.moveTo(-r,r);ctx.lineTo(-r,-r*.4);ctx.stroke();}
+      break;}
+    case "gaze":{ ctx.rotate(rot);
+      ctx.beginPath();ctx.arc(0,0,R*.34,0,7);ctx.stroke();
+      ctx.beginPath();ctx.arc(0,0,R*.12,0,7);ctx.fill();
+      for(let k=0;k<12;k++){const ang=k*Math.PI/6;ctx.beginPath();
+        for(let j=0;j<=8;j++){const rr=R*(.42+j*.07),w=Math.sin(j*.9+k)*R*.025;
+          const x=Math.cos(ang)*rr-Math.sin(ang)*w,y=Math.sin(ang)*rr+Math.cos(ang)*w;j?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+        ctx.stroke();}
+      break;}
+    case "spiral":{ ctx.rotate(-rot*3);ctx.beginPath();
+      for(let j=0;j<=140;j++){const th=j*.09,rr=R*th/12.6;const x=Math.cos(th)*rr,y=Math.sin(th)*rr;j?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+      ctx.stroke();break;}
+    case "web":{ ctx.rotate(rot*.4);
+      for(let k=0;k<8;k++){const ang=k*Math.PI/4;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(ang)*R,Math.sin(ang)*R);ctx.stroke();}
+      for(let k=1;k<=3;k++){const r=R*k/3.2;ctx.beginPath();
+        for(let j=0;j<8;j++){const ang=j*Math.PI/4;const x=Math.cos(ang)*r,y=Math.sin(ang)*r;j?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+        ctx.closePath();ctx.stroke();}
+      break;}
+    case "eyes":{ ctx.rotate(rot*.8);
+      for(let k=0;k<12;k++){const ang=k*Math.PI/6,x=Math.cos(ang)*R*.86,y=Math.sin(ang)*R*.86;
+        const open=.5+.5*Math.sin(t*.35+k*1.7);
+        ctx.beginPath();ctx.ellipse(x,y,R*.06,R*.06*open,ang,0,7);ctx.stroke();
+        ctx.beginPath();ctx.arc(x,y,R*.018,0,7);ctx.fill();}
+      break;}
+    case "shards":{ 
+      for(let k=0;k<7;k++){const ang=k*.897+rot*(k%2?1:-1),rr=R*(.45+.4*((k*7)%5)/5),sz=R*.12;
+        const x=Math.cos(ang)*rr,y=Math.sin(ang)*rr;ctx.beginPath();
+        ctx.moveTo(x,y-sz);ctx.lineTo(x+sz*.87,y+sz*.5);ctx.lineTo(x-sz*.87,y+sz*.5);ctx.closePath();ctx.stroke();}
+      break;}
+    case "ring":{ ctx.rotate(rot*2);
+      ctx.beginPath();ctx.arc(0,0,R*.92,.5,6.05);ctx.stroke();
+      const hx=Math.cos(.5)*R*.92,hy=Math.sin(.5)*R*.92;
+      ctx.beginPath();ctx.moveTo(hx,hy);ctx.lineTo(hx-R*.09,hy-R*.05);ctx.lineTo(hx-R*.02,hy+R*.09);ctx.closePath();ctx.fill();
+      break;}
+  }
+  ctx.restore();
+}
+/* le Regard : un cône qui balaie depuis le centre */
+function drawGaze(){
+  const w=(L.gazeWidth||.35)/2, R=A*.76, pet=GAZE.pet;
+  const z=ZONES[L.zone];
+  ctx.save();ctx.beginPath();ctx.rect(ax,ay,A,A);ctx.clip();
+  ctx.translate(fx,fy);ctx.rotate(GAZE.ang);
+  const g=ctx.createLinearGradient(0,0,R,0);
+  g.addColorStop(0,`hsla(${z.hue},80%,70%,${.16+.12*pet})`);g.addColorStop(1,`hsla(${z.hue},80%,70%,0)`);
+  ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,R,-w,w);ctx.closePath();ctx.fill();
+  ctx.strokeStyle=`hsla(${z.hue},85%,78%,${.28+.3*pet})`;ctx.lineWidth=rs;
+  ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(-w)*R,Math.sin(-w)*R);ctx.moveTo(0,0);ctx.lineTo(Math.cos(w)*R,Math.sin(w)*R);ctx.stroke();
+  /* l'œil */
+  ctx.rotate(-GAZE.ang);
+  ctx.fillStyle=`hsla(${z.hue},80%,80%,${.35+.4*pet})`;
+  ctx.beginPath();ctx.ellipse(0,0,7*rs,4*rs*(1-.5*pet),GAZE.ang,0,7);ctx.fill();
+  ctx.restore();
+}
+/* la Pénombre : tout s'éteint hors du halo du vaisseau */
+function drawEclipse(){
+  const r=ECL.r;
+  const g=ctx.createRadialGradient(ship.x,ship.y,r*.62,ship.x,ship.y,r*1.45);
+  g.addColorStop(0,`rgba(${BGR},${BGG},${BGB},0)`);
+  g.addColorStop(.45,`rgba(${BGR},${BGG},${BGB},.55)`);
+  g.addColorStop(1,`rgba(${BGR},${BGG},${BGB},.94)`);
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle=zoneCol(.10,75);ctx.lineWidth=rs;
+  ctx.beginPath();ctx.arc(ship.x,ship.y,r*.9,0,7);ctx.stroke();
+}
+/* la Porte : un linteau et deux montants, une lumière au fond */
+function drawDoor(){
+  const b=door.born, pulse=.5+.5*Math.sin(performance.now()/300);
+  const h=26*rs*(.6+.4*b), w=17*rs*(.6+.4*b);
+  ctx.save();ctx.translate(door.x,door.y);ctx.globalAlpha=Math.min(1,b*1.4);
+  const g=ctx.createRadialGradient(0,0,0,0,0,h*2.2);
+  g.addColorStop(0,`rgba(255,220,160,${.38+.12*pulse})`);g.addColorStop(1,"rgba(255,180,84,0)");
+  ctx.fillStyle=g;ctx.fillRect(-h*2.2,-h*2.2,h*4.4,h*4.4);
+  /* seuil de lumière */
+  const ig=ctx.createLinearGradient(0,-h/2,0,h/2);
+  ig.addColorStop(0,"rgba(255,236,200,.85)");ig.addColorStop(1,"rgba(255,180,84,.15)");
+  ctx.fillStyle=ig;ctx.fillRect(-w/2+2*rs,-h/2+2*rs,w-4*rs,h-2*rs);
+  ctx.strokeStyle="#FFE2B0";ctx.lineWidth=1.8*rs;
+  ctx.beginPath();ctx.moveTo(-w/2,h/2);ctx.lineTo(-w/2,-h/2);ctx.lineTo(w/2,-h/2);ctx.lineTo(w/2,h/2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-w*.72,-h/2);ctx.lineTo(w*.72,-h/2);ctx.stroke();
+  /* losange qui flotte au-dessus */
+  ctx.rotate(door.tau*1.2);
+  ctx.strokeStyle="#FFB454";ctx.lineWidth=1.3*rs;const d=4*rs;
+  ctx.beginPath();ctx.moveTo(0,-h*.82-d);ctx.lineTo(d,-h*.82);ctx.lineTo(0,-h*.82+d);ctx.lineTo(-d,-h*.82);ctx.closePath();ctx.stroke();
+  ctx.restore();
+  /* anneau d'appel */
+  ctx.strokeStyle=`rgba(255,200,120,${.18+.18*pulse})`;ctx.lineWidth=1.2*rs;
+  ctx.beginPath();ctx.arc(door.x,door.y,(30+6*pulse)*rs,0,7);ctx.stroke();
+}
+function drawBossRing(){
+  const p=Math.min(1,elapsed/L.timeLimit), R=A*.492;
+  ctx.lineWidth=2.2*rs;ctx.strokeStyle="rgba(255,255,255,.06)";
+  ctx.beginPath();ctx.arc(fx,fy,R,0,7);ctx.stroke();
+  ctx.strokeStyle=zoneCol(.45,72);
+  ctx.beginPath();ctx.arc(fx,fy,R,-Math.PI/2,-Math.PI/2+6.283*p);ctx.stroke();
+  const a=-Math.PI/2+6.283*p;
+  ctx.fillStyle=zoneCol(.9,80);
+  ctx.beginPath();ctx.arc(fx+Math.cos(a)*R,fy+Math.sin(a)*R,3*rs,0,7);ctx.fill();
 }
 
 /* fond animé derrière les menus */
@@ -1159,6 +1519,9 @@ function drawIdle(){
   }
 }
 function drawChromeIdle(){
+  const g=ctx.createRadialGradient(fx,fy,A*.3,fx,fy,Math.hypot(W,H)*.55);
+  g.addColorStop(0,"rgba(0,0,0,0)");g.addColorStop(1,"rgba(0,0,0,.7)");
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   ctx.strokeStyle="rgba(255,255,255,.05)";
   ctx.strokeRect(ax+.5,ay+.5,A-1,A-1);
 }
@@ -1167,41 +1530,54 @@ function drawChromeIdle(){
 function damage(){
   lives--;inv=1.6;flash=1;
   const lost=RISK.val; RISK.val=0; RISK.timer=0; recomputeMult();
+  GAZE.pet=0;
   buzz([40,30,40]);Sfx.hit();Sfx.music.duck();
   hitstop=.11; shake=Math.max(shake,.85);
   burst(ship.x,ship.y,26,260*rs,8,.7);
   ringWave(ship.x,ship.y,70*rs,"8",.55);
   if(lost>.3) toast("combo perdu");
   if(lives<=0){ freezeT=.5; burst(ship.x,ship.y,60,340*rs,8,1); loseLevel(); }
-  else toast("touché — "+lives+" vies");
+  else toast(lives===1?"touché — dernière vie":"touché — "+lives+" vies");
   paintHUD();
 }
+const OVER_LINES=[
+  "Le Minotaure a trouvé l'angle.",
+  "Vous avez croisé le Regard.",
+  "Charybde a avalé la marée, et vous avec.",
+  "Le fil a été coupé.",
+  "Argos a rouvert les yeux.",
+  "Le Chaos a repris sa forme — aucune.",
+  "La Boucle s'est refermée sur vous.",
+];
 function loseLevel(){
   state="over";$("hud").classList.remove("on");releaseAwake();
   Sfx.music.stop();
+  $("over-eyebrow").textContent=OVER_LINES[L.zone];
   $("f-score").textContent=Math.floor(score).toLocaleString("fr-FR");
   $("f-time").textContent=Math.floor(elapsed)+"s";
-  $("f-goal").textContent=L.timeLimit?`${Math.min(elapsed,L.timeLimit)|0}/${L.timeLimit}s`:`${tokensGot}/${L.tokensNeeded} ◆`;
+  $("f-goal").textContent=L.timeLimit?`${Math.min(elapsed,L.timeLimit)|0}/${L.timeLimit}s`
+    :door?"la Porte":`${patchCount}/${L.oracles} oracle${L.oracles>1?"s":""}`;
   showScreen("s-over");Sfx.over();buzz([60,40,90]);
 }
-function starCount(){
-  let st=1;
-  if(lives===3)st++;
-  if(patchCount>=1)st++;
-  /* étoile de score : seuil = 60% des tokens en ×2 moyen, sinon near-miss */
-  const tokPts=L.tokensNeeded*120*2;
-  if(score>=tokPts)st++;
-  return Math.min(3,st);
-}
+/* trois étoiles : intact · score ≥ seuil · audace (oracle ambré ou combo ×2) */
+function starList(){ return [lives===3, score>=L.scoreGoal, dared]; }
+function starCount(){ return starList().filter(Boolean).length; }
 function winLevel(){
+  if(state!=="play") return;
   const st=starCount(), sc=Math.floor(score);
   const prevBest=SAVE.best(L.idx);
   SAVE.win(L.idx,st); SAVE.best(L.idx,sc);
   state="win";$("hud").classList.remove("on");releaseAwake();
   Sfx.music.stop();
+  const z=ZONES[L.zone];
+  $("win-eyebrow").textContent=L.timeLimit?`${z.boss} s'est lassé`:"la Porte franchie";
+  $("win-title").textContent=L.timeLimit?"Épreuve surmontée":"Figure résolue";
+  const sl=starList();
+  $("win-crit").innerHTML=[["intact",sl[0]],[`score ≥ ${L.scoreGoal.toLocaleString("fr-FR")}`,sl[1]],["audace",sl[2]]]
+    .map(([k,v])=>`<span class="${v?"ok":""}">${v?"◆":"◇"} ${k}</span>`).join("");
   $("w-score").textContent=sc.toLocaleString("fr-FR");
   $("w-time").textContent=Math.floor(elapsed)+"s";
-  $("w-patch").textContent=patchCount;
+  $("w-patch").textContent=nearCount;
   $("win-best").textContent=prevBest>0
     ? (sc>prevBest?"★ nouveau record !":"record : "+prevBest.toLocaleString("fr-FR"))
     : "";
@@ -1226,14 +1602,16 @@ function winLevel(){
 }
 
 /* ═══ mutations ═══ */
+/* l'Oracle propose trois mutations : les calmes purifient une couche bleue,
+   les ambrées en corrompent une de plus mais paient en points. */
 const MUTATORS=[
-  {lbl:"swirl ×1.4",calme:1,titre:"Écarter les brins",desc:"Les traînées se déroulent.",f:p=>{p.swirl*=1.4;}},
-  {lbl:"rotation −",calme:1,titre:"Ralentir",desc:"Le motif tourne moins vite.",f:p=>{p.speedMul=(p.speedMul||1)*0.82;}},
-  {lbl:"ring +26",calme:1,titre:"Ouvrir le centre",desc:"Un couloir au milieu.",f:p=>{p.ring=(p.ring||99)+26;}},
-  {lbl:"éclaircir",calme:1,titre:"Éclaircir",desc:"Moins de points à l'écran.",f:p=>{p._thin=true;}},
-  {lbl:"ondulation +1",calme:0,mult:.3,titre:"Désorienter",desc:"Plus de croisements.",f:p=>{p.harm=(p.harm||4)+1;}},
-  {lbl:"pétales +2",calme:0,mult:.35,titre:"Replier",desc:"Le motif s'enchevêtre.",f:p=>{p.petals=(p.petals||5)+2;p.fa=(p.fa||5)+2;}},
-  {lbl:"densité ×1.25",calme:0,mult:.3,titre:"Densifier",desc:"Des murs plus compacts.",f:p=>{p._dense=true;}},
+  {lbl:"swirl ×1.4",calme:1,titre:"Le fil d'Ariane",desc:"Les brins se déroulent, le dédale s'ouvre.",f:p=>{p.swirl*=1.4;}},
+  {lbl:"rotation ×0.82",calme:1,titre:"Le sommeil d'Hypnos",desc:"Le motif tourne moins vite.",f:p=>{p.speedMul=(p.speedMul||1)*0.82;}},
+  {lbl:"ring +26",calme:1,titre:"L'Omphalos",desc:"Le nombril du monde : un couloir au centre.",f:p=>{p.ring=(p.ring||99)+26;}},
+  {lbl:"couche −1",calme:1,titre:"L'eau du Léthé",desc:"Une couche bleue oublie qu'elle est bleue.",f:p=>{}},
+  {lbl:"harmonique +1",calme:0,mult:.3,titre:"Le rire de Dionysos",desc:"Plus de croisements, plus d'ivresse.",f:p=>{p.harm=(p.harm||4)+1;}},
+  {lbl:"pétales +2",calme:0,mult:.35,titre:"Le pli de Protée",desc:"Le motif change de forme et s'enchevêtre.",f:p=>{p.petals=(p.petals||5)+2;p.fa=(p.fa||5)+2;}},
+  {lbl:"couche +1 · vitesse ×1.08",calme:0,mult:.3,titre:"La forge d'Héphaïstos",desc:"Une couche de plus vire au bleu, le feu accélère.",f:p=>{p.speedMul=(p.speedMul||1)*1.08;}},
 ];
 function openPatch(){
   if(charge<L.tokensNeeded||state!=="play")return;
@@ -1246,23 +1624,24 @@ function openPatch(){
     m.f(after);
     const b=document.createElement("button");
     b.className="pick";b.style.cssText="display:grid;grid-template-columns:78px 1fr;gap:14px;align-items:center;padding:13px;text-align:left;min-height:104px";
+    b.classList.add(m.calme?"calm":"bold");
     b.innerHTML=`<canvas class="pv" width="78" height="78" style="width:78px;height:78px;border:1px solid var(--line);background:#08080b"></canvas>
-      <span><span style="display:flex;justify-content:space-between;gap:9px">
-      <b style="color:var(--ink);font-size:13px">${m.titre}</b>
-      <span style="font-size:10.5px;letter-spacing:.1em;border:1px solid currentColor;padding:4px 6px;color:${m.calme?"#8fd6f5":"var(--chaud)"}">${m.calme?"plus facile":"+"+Math.round((m.mult||0.3)*100)+" pts"}</span></span>
-      <span style="display:block;font-size:11px;color:var(--dim);margin-top:6px">${m.desc}</span>
-      <span style="display:block;font-size:11px;color:#9b97ae;margin-top:7px">${m.lbl}</span></span>`;
+      <span><span style="display:flex;justify-content:space-between;gap:9px;align-items:flex-start">
+      <b style="color:var(--ink);font-size:13px;font-family:var(--disp);letter-spacing:0;text-transform:none">${m.titre}</b>
+      <span class="badge" style="color:${m.calme?"#8fd6f5":"var(--chaud)"}">${m.calme?"apaise":"+600 · envenime"}</span></span>
+      <span style="display:block;font-size:11px;color:var(--dim);margin-top:6px;text-transform:none;letter-spacing:.02em;line-height:1.5">${m.desc}</span>
+      <span style="display:block;font-size:10px;color:#9b97ae;margin-top:7px">${m.lbl}</span></span>`;
     b.onclick=ev=>{
       const r=b.getBoundingClientRect();
       ringWave((r.left+r.width/2)*rs,(r.top+r.height/2)*rs,120*rs,m.calme?"200":"38",.5);
       m.f(P);patchCount++;
       let purif=false;
-      if(!m.calme){score+=600;if(corruptLayer(true))toast("le motif s'envenime");}
+      if(!m.calme){score+=600;dared=true;if(corruptLayer(true))toast("le motif s'envenime");}
       else if(corruptStack.length+warns.length>0){
         purifyLayer();purif=true;
         burst(fx,fy,40,300*rs,200,.9);ringWave(fx,fy,A*.9,"200",.8);
       }
-      toast(purif?`couche purifiée — ${m.titre.toLowerCase()}`:m.titre);
+      toast(purif?`couche purifiée — ${m.titre}`:m.titre);
       charge=0;orb=null;previews=[];
       state="play";last=performance.now();
       showScreen(null);paintHUD();
@@ -1270,7 +1649,12 @@ function openPatch(){
       burst(ship.x,ship.y,30,220*rs,m.calme?200:38,.7);
       ringWave(ship.x,ship.y,90*rs,m.calme?"200":"38",.55);
       fieldFn=makeField();
-      if(!L.tokenDelay){ tokens=[newToken(),newToken()]; tokens.forEach(tk=>tk.born=1); }
+      /* dernier oracle d'une figure normale → la Porte s'ouvre */
+      if(!L.timeLimit&&patchCount>=L.oracles){
+        doorT=0.9;
+        if(!L.tokenDelay){ tokens=[newToken(),newToken()]; tokens.forEach(tk=>tk.born=1); }
+        else tokens=[];
+      } else if(!L.tokenDelay){ tokens=[newToken(),newToken()]; tokens.forEach(tk=>tk.born=1); }
       else { tokens=[]; tokenSpawnT=Math.min(2.4, L.tokenGap||4); }
     };
     box.appendChild(b);
@@ -1337,7 +1721,8 @@ function showScreen(id){
   if(id){$(id).classList.add("on");sheet=id;}else sheet=null;
 }
 /* ═══ accueil ═══ */
-const RANKS=["Recrue","Apprenti","Pilote","Vétéran","As","Maître","Légende"];
+/* grades : du point sans dimension à l'illimité */
+const RANKS=["Point","Segment","Géomètre","Argonaute","Oracle","Demi-dieu","Apeiron"];
 function bestOverall(){ let m=0; for(const k in SAVE.data.best) m=Math.max(m,SAVE.data.best[k]); return m; }
 function countUp(el,to,suffix=""){
   const target=to.toLocaleString("fr-FR")+suffix;
@@ -1355,23 +1740,23 @@ function paintHome(){
   countUp($("hs-lvl"),done);
   countUp($("hs-stars"),ts);
   countUp($("hs-best"),bestOverall());
-  const next=nextToPlay(), lv=LEVELS[next];
-  $("play-sub").textContent=`niveau ${lv.num} · zone ${ZONES[lv.zone].name.toLowerCase()}`;
+  const next=nextToPlay(), lv=LEVELS[next], z=ZONES[lv.zone];
+  $("play-sub").textContent=`${lv.boss?"épreuve":"figure"} ${lv.num} · ${z.num} ${z.myth.toLowerCase()}`;
 }
 function paintProfile(){
   const done=Object.keys(SAVE.data.stars).length, ts=totalStars();
   const rank=RANKS[Math.min(RANKS.length-1,(done/10)|0)];
   $("pf-name").textContent=rank;
-  $("pf-rank").textContent=`grade ${Math.min(7,(done/10|0)+1)} · ${done}/70 niveaux`;
+  $("pf-rank").textContent=`grade ${Math.min(7,(done/10|0)+1)} · ${done}/70 figures`;
   let zd=0;
   const list=$("pf-zlist"); list.innerHTML="";
   ZONES.forEach((z,zi)=>{
     let d=0; for(let i=0;i<10;i++) if(SAVE.stars(zi*10+i)>0) d++;
     if(d===10)zd++;
-    const row=document.createElement("div"); row.className="pf-z";
-    row.innerHTML=`<b>0${zi+1} ${z.name}</b><span class="pf-bar" role="progressbar"
-      aria-label="zone ${z.name}" aria-valuenow="${d}" aria-valuemin="0" aria-valuemax="10"
-      aria-valuetext="${d} sur 10 niveaux"><i style="transform:scaleX(${d/10})"></i></span><span>${d}/10</span>`;
+    const row=document.createElement("div"); row.className="pf-z"; row.style.setProperty("--zh",z.hue);
+    row.innerHTML=`<b>${z.num} ${z.myth}</b><span class="pf-bar" role="progressbar"
+      aria-label="${z.myth}" aria-valuenow="${d}" aria-valuemin="0" aria-valuemax="10"
+      aria-valuetext="${d} sur 10 figures"><i style="transform:scaleX(${d/10})"></i></span><span>${d}/10</span>`;
     list.appendChild(row);
   });
   $("pf-zones-done").textContent=zd+"/7";
@@ -1390,19 +1775,23 @@ function goMap(){
   buildMap();showScreen("s-levels");L=null;
 }
 function goBrief(n){
-  const lv=LEVELS[n];
-  $("brief-zone").textContent=`zone ${ZONES[lv.zone].name} · difficulté ${(lv.diff*100|0)} %`;
+  const lv=LEVELS[n], z=ZONES[lv.zone];
+  const card=$("s-brief").querySelector(".card"); card.style.setProperty("--zh",z.hue);
+  $("brief-zone").textContent=`${z.num} · ${z.myth} — ${z.name.toLowerCase()} · ${(lv.diff*100|0)} %`;
+  $("brief-kind").textContent=lv.boss?"Épreuve":"Figure";
   $("brief-num").textContent=lv.num;
-  $("brief-name").textContent=[
-    lv.motion&&lv.motion!=="spin"?MOTIONS[lv.motion].label:"",
-    ...lv.mods.map(m=>MODS[m].label)
-  ].filter(Boolean).join(" · ");
-  $("brief-goal").textContent=lv.timeLimit?`tenir ${lv.timeLimit}s`:`${lv.tokensNeeded} ◆ puis ⬡`;
-  $("brief-time").textContent=lv.timeLimit?lv.timeLimit+"s":"libre";
-  $("brief-density").textContent=lv.density;
+  $("brief-name").textContent=lv.boss?z.boss:(lv.motion&&lv.motion!=="spin"?MOTIONS[lv.motion].label:FAMILIES[lv.fam].label);
+  $("brief-epi").textContent=lv.boss?z.bossLine:z.epigraph;
+  $("brief-goal").textContent=lv.timeLimit?`${lv.timeLimit} s`:"la Porte";
+  $("brief-time-lbl").textContent=lv.timeLimit?"tessères":"oracles";
+  $("brief-time").textContent=lv.timeLimit?`${lv.tokensNeeded} ◆`:`${lv.oracles} × ${lv.tokensNeeded} ◆`;
+  $("brief-density").textContent=lv.scoreGoal.toLocaleString("fr-FR");
   const bst=SAVE.best(lv.num-1);
   $("brief-best").textContent=bst?bst.toLocaleString("fr-FR"):"—";
   $("brief-best").style.color=bst?"var(--vert)":"";
+  /* étoiles déjà obtenues */
+  const st=SAVE.stars(lv.num-1), sb=$("brief-stars");
+  sb.innerHTML=[0,1,2].map(i=>`<i class="${i<st?"on":""}"></i>`).join("");
   const mods=$("brief-mods");mods.innerHTML="";
   if(lv.motion && lv.motion!=="spin" && MOTIONS[lv.motion]){
     const d=document.createElement("div");
@@ -1412,11 +1801,11 @@ function goBrief(n){
   if(lv.mods.length){
     lv.mods.forEach(mk=>{
       const d=document.createElement("div");
-      d.innerHTML=`<u>⚠</u><span><b>${MODS[mk].label}</b> — ${MODS[mk].desc}</span>`;
+      d.innerHTML=`<u>${MODS[mk].ico||"⚠"}</u><span><b>${MODS[mk].label}</b> — ${MODS[mk].desc}</span>`;
       mods.appendChild(d);
     });
   } else if(!lv.motion || lv.motion==="spin"){
-    mods.innerHTML=`<div><u>✓</u><span>Aucun modificateur — le motif pur de la zone.</span></div>`;
+    mods.innerHTML=`<div><u>✓</u><span>Aucune règle ajoutée — le motif pur, celui qui tourne.</span></div>`;
   }
   pendingLevel=n;
   state="brief";showScreen("s-brief");
@@ -1427,13 +1816,13 @@ function briefGo(){startLevel(pendingLevel);}
 function buildMap(){
   const zones=$("zones");zones.innerHTML="";
   const cur=Math.min(SAVE.data.unlocked,70);
-  $("prog").innerHTML=`progression : <b>${Object.keys(SAVE.data.stars).length}/70 niveaux</b> · <b>${totalStars()}</b> étoiles`;
+  $("prog").innerHTML=`progression : <b>${Object.keys(SAVE.data.stars).length}/70 figures</b> · <b>${totalStars()}</b> étoiles`;
   ZONES.forEach((z,zi)=>{
     const div=document.createElement("div");div.className="zone";
     const done=Array.from({length:10},(_,i)=>SAVE.stars(zi*10+i)>0).filter(Boolean).length;
     div.style.setProperty("--zh",z.hue);
-    const h=document.createElement("h2");h.dataset.z=zi+1;
-    h.innerHTML=`${z.name} <small style="color:#9b97ae">${done}/10</small>`;
+    const h=document.createElement("h2");h.dataset.z=z.num;
+    h.innerHTML=`${z.myth}<em>${z.name.toLowerCase()}</em><small style="color:#9b97ae">${done}/10</small>`;
     div.appendChild(h);
     const row=document.createElement("div");row.className="lvlrow";
     for(let i=0;i<10;i++){
@@ -1441,11 +1830,12 @@ function buildMap(){
       const b=document.createElement("button");b.className="lvltile";
       const unlocked=SAVE.isUnlocked(num);
       const st=SAVE.stars(num-1);
+      if(i===9)b.classList.add("boss");
       if(!unlocked)b.classList.add("locked");
       else if(st>0)b.classList.add("done");
       else if(num===cur)b.classList.add("cur");
       b.innerHTML=`${num}${st?`<span class="st">${[0,1,2].map(j=>`<i class="${j<st?"on":""}"></i>`).join("")}</span>`:""}`;
-      b.setAttribute("aria-label",`niveau ${num}${unlocked?"":", verrouillé"}`);
+      b.setAttribute("aria-label",`${i===9?"épreuve":"figure"} ${num}${unlocked?"":", verrouillée"}`);
       if(unlocked){b.onclick=()=>goBrief(num-1);}
       else{b.disabled=true;}
       row.appendChild(b);
@@ -1464,8 +1854,9 @@ function pauseTo(id){
     state="paused";ship.vx=ship.vy=0;
     Sfx.music.setPaused(true);
     /* étoiles en jeu */
-    const st=starCount(),ps=$("pause-stars");
-    [...ps.querySelectorAll("i")].forEach((el,i)=>el.classList.toggle("on",i<st));
+    const sl=starList(),ps=$("pause-stars");
+    [...ps.querySelectorAll("i")].forEach((el,i)=>el.classList.toggle("on",sl[i]));
+    $("pause-obj").innerHTML=objective();
   }
   releaseAwake();
   showScreen(id);
@@ -1563,12 +1954,12 @@ $("btn-wipe").onclick=()=>{
   }
 };
 $("btn-unlock").onclick=()=>{
-  SAVE.unlockAll();buildMap();paintHome();toast("70 niveaux débloqués");
+  SAVE.unlockAll();buildMap();paintHome();toast("70 figures débloquées");
 };
 
 /* init */
 resize();goHome();requestAnimationFrame(frame);
-$("ver").textContent="v10 · "+(COARSE?"tactile":"souris");
+$("ver").textContent="v14 · "+(COARSE?"tactile":"souris");
 setTimeout(()=>{ $("splash").classList.add("off"); },1400);
 /* premier lancement → aide auto */
 try{
